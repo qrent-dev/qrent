@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRentalGuideProgressStore } from '../store/rentalGuideProgressStore';
-import { useTranslations } from 'next-intl';
 
 interface ChecklistProps {
   title: string;
@@ -13,8 +12,6 @@ interface ChecklistProps {
 }
 
 const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
-  const t = useTranslations('CheckList');
-
   const { checkedTasks, updateProgress } = useRentalGuideProgressStore();
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -29,7 +26,7 @@ const Checklist: React.FC<ChecklistProps> = ({ title, stepsData }) => {
   const progress = (checkedItems / totalTasks) * 100;
 
   return (
-    <div className="max-w-lg mx-auto p-5 sticky">
+    <div className="max-w-lg mx-auto p-5">
       {/* Header */}
       <h2 className="text-2xl font-bold text-left text-blue-primary mb-4">{title}</h2>
 
