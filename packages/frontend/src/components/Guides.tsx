@@ -339,7 +339,7 @@ const Guides = () => {
       </div>
 
       {/* Guides (Articles Grid) */}
-      <div className="h-[680px] overflow-y-auto">
+      <div className="h-screen">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1 */}
           <div className="flex flex-col gap-6">
@@ -362,17 +362,22 @@ const Guides = () => {
                     </div>
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={guide.image} 
-                    alt={guide.title} 
+                  <img
+                    src={guide.image}
+                    alt={guide.title}
                     className={`w-full object-cover ${
-                      guide.isLandscape 
+                      guide.isLandscape
                         ? 'h-[130px]' // 横图高度
                         : 'h-[455px]' // 竖图高度
                     }`}
                   />
                   <div className="p-3">
-                    <h3 className={`text-[15px] line-clamp-2 leading-tight ${guide.admin ? 'font-bold' : 'font-normal'}`} style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}>
+                    <h3
+                      className={`text-[15px] line-clamp-2 leading-tight ${
+                        guide.admin ? 'font-bold' : 'font-normal'
+                      }`}
+                      style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}
+                    >
                       {guide.titleKey ? t(guide.titleKey) : guide.title}
                     </h3>
                     {!guide.admin && (
@@ -385,7 +390,7 @@ const Guides = () => {
                 </a>
               ))}
           </div>
-          
+
           {/* Column 2 */}
           <div className="flex flex-col gap-6">
             {filteredArticles
@@ -410,17 +415,22 @@ const Guides = () => {
                     </div>
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={guide.image} 
-                    alt={guide.title} 
+                  <img
+                    src={guide.image}
+                    alt={guide.title}
                     className={`w-full object-cover ${
-                      guide.isLandscape 
+                      guide.isLandscape
                         ? 'h-[130px]' // 横图高度
                         : 'h-[455px]' // 竖图高度
                     }`}
                   />
                   <div className="p-3">
-                    <h3 className={`text-[15px] line-clamp-2 leading-tight ${guide.admin ? 'font-bold' : 'font-normal'}`} style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}>
+                    <h3
+                      className={`text-[15px] line-clamp-2 leading-tight ${
+                        guide.admin ? 'font-bold' : 'font-normal'
+                      }`}
+                      style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}
+                    >
                       {guide.titleKey ? t(guide.titleKey) : guide.title}
                     </h3>
                     {!guide.admin && (
@@ -433,7 +443,7 @@ const Guides = () => {
                 </a>
               ))}
           </div>
-          
+
           {/* Column 3 */}
           <div className="flex flex-col gap-6">
             {filteredArticles
@@ -458,17 +468,22 @@ const Guides = () => {
                     </div>
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={guide.image} 
-                    alt={guide.title} 
+                  <img
+                    src={guide.image}
+                    alt={guide.title}
                     className={`w-full object-cover ${
-                      guide.isLandscape 
+                      guide.isLandscape
                         ? 'h-[130px]' // 横图高度
                         : 'h-[455px]' // 竖图高度
                     }`}
                   />
                   <div className="p-3">
-                    <h3 className={`text-[15px] line-clamp-2 leading-tight ${guide.admin ? 'font-bold' : 'font-normal'}`} style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}>
+                    <h3
+                      className={`text-[15px] line-clamp-2 leading-tight ${
+                        guide.admin ? 'font-bold' : 'font-normal'
+                      }`}
+                      style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}
+                    >
                       {guide.titleKey ? t(guide.titleKey) : guide.title}
                     </h3>
                     {!guide.admin && (
@@ -481,7 +496,7 @@ const Guides = () => {
                 </a>
               ))}
           </div>
-          
+
           {/* Column 4 */}
           <div className="flex flex-col gap-6">
             {filteredArticles
@@ -506,17 +521,22 @@ const Guides = () => {
                     </div>
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={guide.image} 
-                    alt={guide.title} 
+                  <img
+                    src={guide.image}
+                    alt={guide.title}
                     className={`w-full object-cover ${
-                      guide.isLandscape 
+                      guide.isLandscape
                         ? 'h-[130px]' // 横图高度
                         : 'h-[455px]' // 竖图高度
                     }`}
                   />
                   <div className="p-3">
-                    <h3 className={`text-[15px] line-clamp-2 leading-tight ${guide.admin ? 'font-bold' : 'font-normal'}`} style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}>
+                    <h3
+                      className={`text-[15px] line-clamp-2 leading-tight ${
+                        guide.admin ? 'font-bold' : 'font-normal'
+                      }`}
+                      style={{ fontFamily: 'PingFang SC, -apple-system, system-ui, sans-serif' }}
+                    >
                       {guide.titleKey ? t(guide.titleKey) : guide.title}
                     </h3>
                     {!guide.admin && (
