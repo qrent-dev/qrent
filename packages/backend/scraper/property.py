@@ -12,6 +12,7 @@ from data_cleaner import clean_rental_data
 from commute_time import update_commute_time
 from point import main as process_missing_fields
 from change_to_sql import push_delta_to_remote_db
+import tempfile
 # Base URL template for rental listings
 base_url = "https://www.domain.com.au/rent/{}/?excludedeposittaken=1"
 
@@ -25,6 +26,13 @@ options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_argument(
     "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 )
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+#Add a unique temporary user data directory
+options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
+
+# Initialize driver
 driver = webdriver.Chrome(options=options)
 
 
@@ -143,4 +151,19 @@ if __name__ == "__main__":
     for file in files_to_remove:
         if os.path.exists(file):
             os.remove(file)
-            print(f"{file} has been removed.")    
+            print(f"{file} has been removed.")
+    csv_directory = '.'
+    for filename in os.listdir(csv_directory):
+        if filename.startswith("merged_rentdata_") and filename.endswith(".csv"):
+            os.remove(os.path.join(csv_directory, filename))
+            print(f"{filename} has been removed.")
+    prev_date = datetime.fromtimestamp(datetime.now().timestamp() - 86400).strftime("%y%m%d")
+
+    files_to_remove_prev = [f'USYD_rentdata_{prev_date}.csv', f'UNSW_rentdata_{prev_date}.csv']
+
+    for file in files_to_remove_prev:
+        if os.path.exists(file):
+            os.remove(file)
+            print(f"{file} has been removed (previous day's file).")
+        else:
+            print(f"{file} does not exist.")   

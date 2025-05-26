@@ -6,6 +6,8 @@ from tqdm import tqdm
 import time
 from datetime import datetime, timedelta
 import re
+from selenium.webdriver.chrome.options import Options
+import tempfile
 
 def scrape_property_data(university):
     current_date = datetime.now().strftime('%y%m%d')
@@ -21,13 +23,12 @@ def scrape_property_data(university):
     if os.path.exists(yesterday_file):
         yesterday_data = pd.read_csv(yesterday_file)
         yesterday_data = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
-        # 保证所需字段存在
+
         for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']:
             if col not in today_data.columns:
                 today_data[col] = None 
             if col not in yesterday_data.columns:
                 yesterday_data[col] = None 
-        # merge the data: 用昨天数据映射填充今天缺失的信息
         today_data['description'] = today_data['addressLine1'].map(
             yesterday_data.set_index('addressLine1')['description']
         )
@@ -62,9 +63,21 @@ def scrape_property_data(university):
     missing_property_desc = today_data[today_data['description'].isna()]
     num_missing = len(missing_property_desc)
     print(f"datamissing: {num_missing}")
-    
-    # 初始化 Selenium Chrome 浏览器
-    driver = webdriver.Chrome()
+
+    # Initialize Selenium Chrome driver with options
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--window-size=1920x1080')
+    chrome_options.add_argument('--log-level=3')
+    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    chrome_options.add_argument('--disable-extensions')
+    chrome_options.add_argument('--disable-infobars')
+    chrome_options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
+
+    driver = webdriver.Chrome(options=chrome_options)
     base_url = "https://www.domain.com.au/{}/"
     
     def scrape_data(url):
