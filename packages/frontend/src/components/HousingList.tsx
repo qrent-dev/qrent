@@ -128,11 +128,14 @@ const HousingListInEfficiencyFilter = () => {
       requestBody.page = 1;
       requestBody.pageSize = 1000000;
 
-      requestBody.publishedAt = new Date().toDateString();
+      // requestBody.publishedAt = new Date().toDateString();
 
       requestBody.orderBy = [
         {
           averageScore: 'desc',
+        },
+        {
+          publishedAt: 'desc',
         },
       ];
 
@@ -154,6 +157,8 @@ const HousingListInEfficiencyFilter = () => {
       setTotalPage(Math.ceil(results.length / 10));
 
       setListings(results);
+
+      console.log(results.length);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

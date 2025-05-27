@@ -13,44 +13,7 @@ import {
 } from '@heroui/react';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
-
-const SUBURB_OPTIONS = {
-  unsw: [
-    'Alexandria',
-    'Bondi',
-    'Botany',
-    'Coogee',
-    'Eastgardens',
-    'Eastlakes',
-    'Hillsdale',
-    'Kensington',
-    'Kingsford',
-    'Maroubra',
-    'Mascot',
-    'Matraville',
-    'Paddington',
-    'Randwick',
-    'Redfern',
-    'Rosebery',
-    'Waterloo',
-    'WolliCreek',
-    'Zetland',
-  ],
-  usyd: [
-    'Burwood',
-    'Chippendale',
-    'City',
-    'Glebe',
-    'Haymarket',
-    'Hurstville',
-    'Mascot',
-    'Newtown',
-    'Ultimo',
-    'Waterloo',
-    'WolliCreek',
-    'Zetland',
-  ],
-};
+import { SUBURB_OPTIONS } from './HousingFilter';
 
 const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
