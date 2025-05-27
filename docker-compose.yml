@@ -45,7 +45,7 @@ services:
   
   scraper:
     build:
-      context: ./packages/backend/scraper
+      context: ./packages/scraper
       dockerfile: Dockerfile
     env_file:
       - .env
@@ -60,7 +60,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     volumes:
-      - ./packages/backend/scraper:/app/scraper
+      - ./packages/scraper:/app/scraper
       - scraper-logs:/app/scraper/logs
     networks:
       - qrent-network
