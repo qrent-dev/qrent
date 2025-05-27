@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv('.env')
 
 API_BASE_URL = 'https://api.transport.nsw.gov.au/v1/tp/'
-API_KEY =  os.getenv('API_KEY')
+API_KEY =  os.getenv('NSW_TRANSPORT_API_KEY')
 
 HEADERS = {
     'Authorization': f'apikey {API_KEY}'
