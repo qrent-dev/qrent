@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 load_dotenv('.env')
 
-API_KEY_POINT = os.getenv('API_KEY_POINT')
+API_KEY_POINT = os.getenv('PROPERTY_RATING_API_KEY')
 MODEL_NAME = "qwen-plus-1220"
 
 today_date = datetime.now()

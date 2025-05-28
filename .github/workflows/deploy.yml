@@ -41,6 +41,8 @@ jobs:
 
           export JWT_SECRET='${{ secrets.JWT_SECRET }}'
           export API_KEY='${{ secrets.API_KEY }}'
+          export NSW_TRANSPORT_API_KEY='${{ secrets.NSW_TRANSPORT_API_KEY }}'
+          export PROPERTY_RATING_API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
           export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
           export EXPOSE_PORT='3201'
           export DATABASE_URL='mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@db:3306/qrent'

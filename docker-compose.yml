@@ -42,26 +42,32 @@ services:
       - ./packages/shared:/app/packages/shared
     networks:
       - qrent-network
-  crawler:
+  
+  scraper:
     build:
-      context: ./packages/backend/scraper
+      context: ./packages/scraper
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${DB_USER:-property_user}
+      - DB_PASSWORD=${DB_PASSWORD:-${MYSQL_PROPERTY_USER_PASSWORD}}
+      - DB_DATABASE=${MYSQL_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
     volumes:
-      - ./packages/backend/scraper:/app
+      - ./packages/scraper:/app/scraper
+      - scraper-logs:/app/scraper/logs
     networks:
       - qrent-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    command: sh -c "chmod +x /app/start_crawler.sh && exec /app/start_crawler.sh"
 
 networks:
   qrent-network:
 
 volumes:
   qrent-data:
+  scraper-logs:

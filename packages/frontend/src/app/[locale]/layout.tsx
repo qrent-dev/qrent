@@ -1,4 +1,3 @@
-import Footer from '@/src/components/Footer';
 import FooterHandler from '@/src/components/FooterHandler';
 import NavBar from '@/src/components/NavBar';
 import { routing } from '@/src/i18n/routing';
