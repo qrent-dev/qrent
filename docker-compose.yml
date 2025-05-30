@@ -43,27 +43,27 @@ services:
     networks:
       - qrent-network
   
-  scraper:
-    build:
-      context: ./packages/scraper
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=${DB_USER:-property_user}
-      - DB_PASSWORD=${DB_PASSWORD:-${MYSQL_PROPERTY_USER_PASSWORD}}
-      - DB_DATABASE=${MYSQL_DATABASE}
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-    volumes:
-      - ./packages/scraper:/app/scraper
-      - scraper-logs:/app/scraper/logs
-    networks:
-      - qrent-network
+  # scraper:
+  #   build:
+  #     context: ./packages/scraper
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=3306
+  #     - DB_USER=${DB_USER:-property_user}
+  #     - DB_PASSWORD=${DB_PASSWORD:-${MYSQL_PROPERTY_USER_PASSWORD}}
+  #     - DB_DATABASE=${MYSQL_DATABASE}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./packages/scraper:/app/scraper
+  #     - scraper-logs:/app/scraper/logs
+  #   networks:
+  #     - qrent-network
 
 networks:
   qrent-network:
