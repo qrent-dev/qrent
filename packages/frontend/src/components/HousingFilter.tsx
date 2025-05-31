@@ -57,40 +57,63 @@ const HousingFilter = () => {
   const usydAreaOptions = [...SUBURB_OPTIONS.usyd];
 
   const handleCheckboxChange = (option: string) => {
+    // Define area mappings - when key is selected, also include the value(s)
+    const areaMappings: Record<string, string[]> = {
+      Bondi: ['Bondi-Junction'],
+      WolliCreek: ['Wolli-Creek'],
+      City: ['Sydney', 'Millers-Point', 'Moore-Park', 'Surry-Hills', 'The-Rocks', 'Woolloomooloo'],
+    };
+
     // If "Any" is selected
     if (option === 'Any') {
       if (filter.area.includes('Any')) {
-        // If "Any" is already selected, unselect it
         updateFilter({
           ...filter,
           area: [],
         });
       } else {
-        // If "Any" is not selected, select only "Any"
         updateFilter({
           ...filter,
           area: ['Any'],
         });
       }
+      return;
     }
+
     // If another option is selected while "Any" was previously selected
-    else if (filter.area.includes('Any')) {
-      updateFilter({
-        ...filter,
-        area: [option], // Replace "Any" with the new option
-      });
-    }
-    // Normal toggle behavior for other cases
-    else {
-      const newArea = filter.area.includes(option)
-        ? filter.area.filter(item => item !== option) // Unselect if already selected
-        : [...filter.area, option]; // Select if not selected
+    if (filter.area.includes('Any')) {
+      const newAreas = [option];
+      // Add mapped areas if they exist for this option
+      if (areaMappings[option]) {
+        newAreas.push(...areaMappings[option]);
+      }
 
       updateFilter({
         ...filter,
-        area: newArea,
+        area: newAreas,
       });
+      return;
     }
+
+    // Normal toggle behavior for other cases
+    let newArea;
+    if (filter.area.includes(option)) {
+      // When unselecting, remove both the option and any mapped areas
+      newArea = filter.area.filter(
+        item => item !== option && !areaMappings[option]?.includes(item)
+      );
+    } else {
+      // When selecting, add both the option and any mapped areas
+      newArea = [...filter.area, option];
+      if (areaMappings[option]) {
+        newArea.push(...areaMappings[option]);
+      }
+    }
+
+    updateFilter({
+      ...filter,
+      area: newArea,
+    });
   };
 
   return (

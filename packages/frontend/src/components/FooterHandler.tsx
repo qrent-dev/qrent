@@ -5,7 +5,10 @@ import Footer from './Footer';
 
 export default function FooterHandler() {
   const pathname = usePathname();
-  const hideFooter = pathname?.endsWith('/findAHome') || pathname?.endsWith('/justLanded');
+  const hideFooter =
+    pathname?.endsWith('/findAHome') ||
+    pathname?.endsWith('/justLanded') ||
+    pathname?.endsWith('/rentalGuide');
 
   return <>{!hideFooter && <Footer />}</>;
 }
