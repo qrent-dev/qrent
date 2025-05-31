@@ -66,7 +66,7 @@ const HousingFilter = () => {
 
     // If "Any" is selected
     if (option === 'Any') {
-      if (filter.area.includes('Any')) {
+      if (filter.area.includes('Any') && filter.area.length == 1) {
         updateFilter({
           ...filter,
           area: [],
@@ -122,6 +122,7 @@ const HousingFilter = () => {
       <div className="mt-4">
         <div className="text-lg text-gray-600 font-bold">{t('university')}</div>
         <select
+          aria-label="university"
           className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
           value={filter.university}
           onChange={e => updateFilter({ ...filter, university: e.target.value })}
@@ -209,6 +210,7 @@ const HousingFilter = () => {
         <div className="text-lg text-gray-600 font-bold">{t('property-type')}</div>
         <div className="flex justify-between items-center gap-3 mt-3">
           <select
+            aria-label="propertyType"
             className="border rounded px-2 py-1 max-h-40 overflow-y-auto w-full"
             value={filter.propertyType}
             onChange={e => updateFilter({ ...filter, propertyType: e.target.value })}
@@ -334,6 +336,7 @@ const HousingFilter = () => {
       <div className="pb-4 mt-4">
         <div className="text-lg text-gray-600 font-bold">{t('avaliable-date')}</div>
         <input
+          aria-label="date"
           type="date"
           className="border rounded px-2 py-1 mt-2"
           value={filter.avaliableDate}
