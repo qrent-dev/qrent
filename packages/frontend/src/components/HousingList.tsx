@@ -65,7 +65,7 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.maxBathrooms = parseInt(filter.bathroomMax);
       }
 
-      if (filter.area && filter.area.length > 0) {
+      if (filter.area && filter.area.length > 0 && !filter.area.includes('Any')) {
         requestBody.regions = filter.area.join(' ');
       } else {
         // if filter area is empty, user didn't choose any region
@@ -128,14 +128,11 @@ const HousingListInEfficiencyFilter = () => {
       requestBody.page = 1;
       requestBody.pageSize = 1000000;
 
-      // requestBody.publishedAt = new Date().toDateString();
+      requestBody.publishedAt = new Date().toISOString().split('T')[0];
 
       requestBody.orderBy = [
         {
           averageScore: 'desc',
-        },
-        {
-          publishedAt: 'desc',
         },
       ];
 
@@ -158,6 +155,7 @@ const HousingListInEfficiencyFilter = () => {
 
       setListings(results);
 
+      console.log('now running just landed');
       console.log(results.length);
     } catch (error) {
       console.error('Error fetching properties:', error);

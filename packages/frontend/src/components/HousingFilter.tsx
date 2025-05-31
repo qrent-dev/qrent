@@ -66,7 +66,7 @@ const HousingFilter = () => {
 
     // If "Any" is selected
     if (option === 'Any') {
-      if (filter.area.includes('Any')) {
+      if (filter.area.includes('Any') && filter.area.length == 1) {
         updateFilter({
           ...filter,
           area: [],

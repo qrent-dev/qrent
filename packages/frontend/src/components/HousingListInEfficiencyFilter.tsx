@@ -63,7 +63,7 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.maxBathrooms = parseInt(filter.bathroomMax);
       }
 
-      if (filter.area && filter.area.length > 0) {
+      if (filter.area && filter.area.length > 0 && !filter.area.includes('Any')) {
         requestBody.regions = filter.area.join(' ');
       } else {
         // if filter area is empty, user didn't choose any region
