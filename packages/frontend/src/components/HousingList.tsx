@@ -134,6 +134,9 @@ const HousingListInEfficiencyFilter = () => {
         {
           averageScore: 'desc',
         },
+        {
+          publishedAt: 'desc',
+        },
       ];
 
       console.log(requestBody);
@@ -155,7 +158,6 @@ const HousingListInEfficiencyFilter = () => {
 
       setListings(results);
 
-      console.log('now running just landed');
       console.log(results.length);
     } catch (error) {
       console.error('Error fetching properties:', error);
