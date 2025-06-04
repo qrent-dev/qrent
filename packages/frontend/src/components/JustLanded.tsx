@@ -40,6 +40,7 @@ const JustLanded = () => {
         body: JSON.stringify(requestBody),
       });
       let results = await response.json();
+      results = results.properties;
 
       for (const result of results) {
         if (result.url == 'https://www.domain.com.au/nan' || result.addressLine1 == null) {

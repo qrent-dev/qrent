@@ -124,7 +124,7 @@ const HousingListInEfficiencyFilter = () => {
       }
 
       requestBody.page = 1;
-      requestBody.pageSize = 10000000;
+      requestBody.pageSize = 300;
 
       requestBody.orderBy = [
         {
@@ -141,7 +141,8 @@ const HousingListInEfficiencyFilter = () => {
         },
         body: JSON.stringify(requestBody),
       });
-      const results = await response.json();
+      let results = await response.json();
+      results = results.properties;
 
       if (results.length == 0) {
         setHasMore(false);
