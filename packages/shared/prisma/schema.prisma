@@ -67,6 +67,7 @@ model Property {
   @@index([availableDate])
   @@index([averageScore])
   @@index([publishedAt])
+  @@index([addressLine2])
   @@map("property")
 }
 

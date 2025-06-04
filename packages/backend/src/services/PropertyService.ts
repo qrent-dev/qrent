@@ -133,7 +133,7 @@ class PropertyService {
       const regions = preferences.regions.split(' ');
       where.OR = regions.map(region => ({
         addressLine2: {
-          contains: region,
+          startsWith: region,
         },
       }));
     }
