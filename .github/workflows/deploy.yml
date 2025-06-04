@@ -40,7 +40,7 @@ jobs:
           cd ~/qrent/
 
           export JWT_SECRET='${{ secrets.JWT_SECRET }}'
-          export API_KEY='${{ secrets.API_KEY }}'
+          export API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
           export NSW_TRANSPORT_API_KEY='${{ secrets.NSW_TRANSPORT_API_KEY }}'
           export PROPERTY_RATING_API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
           export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
@@ -61,3 +61,4 @@ jobs:
           else
             echo "Server is up and running with status code 200"
           fi
+          
