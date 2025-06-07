@@ -63,7 +63,13 @@ class PropertyService {
       publishedAt?: string;
       orderBy?: Prisma.PropertyOrderByWithRelationInput[];
     }
-  ): Promise<Property[]> {
+  ): Promise<{
+    properties: Property[];
+    propertyCount: number;
+    totalProperties: number;
+    averageWeeklyPrice: number | null;
+    averageCommuteTime: number | null;
+  }> {
     const page = preferences.page;
     const pageSize = preferences.pageSize;
     const skip = (page - 1) * pageSize;
@@ -97,19 +103,28 @@ class PropertyService {
     const where: Prisma.PropertyWhereInput = {};
 
     // Price filter
-    where.pricePerWeek = { gte: preferences.minPrice ?? 0 };
+    where.pricePerWeek = {};
+    if (preferences.minPrice) {
+      where.pricePerWeek.gte = preferences.minPrice;
+    }
     if (preferences.maxPrice) {
       where.pricePerWeek.lte = preferences.maxPrice;
     }
 
     // Bedroom filter
-    where.bedroomCount = { gte: preferences.minBedrooms ?? 0 };
+    where.bedroomCount = {};
+    if (preferences.minBedrooms) {
+      where.bedroomCount.gte = preferences.minBedrooms;
+    }
     if (preferences.maxBedrooms) {
       where.bedroomCount.lte = preferences.maxBedrooms;
     }
 
     // Bathroom filter
-    where.bathroomCount = { gte: preferences.minBathrooms ?? 0 };
+    where.bathroomCount = {};
+    if (preferences.minBathrooms) {
+      where.bathroomCount.gte = preferences.minBathrooms;
+    }
     if (preferences.maxBathrooms) {
       where.bathroomCount.lte = preferences.maxBathrooms;
     }
@@ -120,10 +135,16 @@ class PropertyService {
     }
 
     // Rating filter
-    where.averageScore = { gte: preferences.minRating ?? 0 };
+    where.averageScore = {};
+    if (preferences.minRating) {
+      where.averageScore.gte = preferences.minRating;
+    }
 
     // Commute time filter
-    where.commuteTime = { gte: preferences.minCommuteTime ?? 0 };
+    where.commuteTime = {};
+    if (preferences.minCommuteTime) {
+      where.commuteTime.gte = preferences.minCommuteTime;
+    }
     if (preferences.maxCommuteTime) {
       where.commuteTime.lte = preferences.maxCommuteTime;
     }
@@ -133,7 +154,7 @@ class PropertyService {
       const regions = preferences.regions.split(' ');
       where.OR = regions.map(region => ({
         addressLine2: {
-          contains: region,
+          startsWith: region,
         },
       }));
     }
@@ -143,6 +164,7 @@ class PropertyService {
       where.publishedAt = { gte: new Date(preferences.publishedAt) };
     }
 
+    // Get properties that match the filter
     const properties = await prisma.property.findMany({
       where,
       take: pageSize,
@@ -150,7 +172,78 @@ class PropertyService {
       orderBy,
     });
 
-    return properties;
+    // Total number of properties that match the filter
+    const propertyCount = await prisma.property.count({
+      where,
+    });
+
+    // Total number of properties in the database
+    const totalProperties = await prisma.property.count();
+
+    // Average weekly price of properties that match the filter
+    const averageWeeklyPrice = await prisma.property.aggregate({
+      where,
+      _avg: { pricePerWeek: true },
+    });
+
+    // Average commute time of properties that match the filter
+    const averageCommuteTime = await prisma.property.aggregate({
+      where,
+      _avg: { commuteTime: true },
+    });
+
+    return {
+      properties,
+      propertyCount,
+      totalProperties,
+      averageWeeklyPrice: averageWeeklyPrice._avg.pricePerWeek,
+      averageCommuteTime: averageCommuteTime._avg.commuteTime,
+    };
+  }
+
+  async getRegionSummary(regions: string) {
+    const where: Prisma.PropertyWhereInput = {};
+
+    const regionList = regions.split(' ');
+    where.OR = regionList.map(region => ({
+      addressLine2: {
+        startsWith: region,
+      },
+    }));
+
+    const summaries = await prisma.property.groupBy({
+      by: ['addressLine2'],
+      where,
+      _count: true,
+      _avg: { pricePerWeek: true, commuteTime: true, averageScore: true },
+    });
+
+    const top5Regions = await prisma.property.groupBy({
+      by: ['addressLine2'],
+      _count: {
+        _all: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return {
+      summaries: summaries.map(summary => ({
+        region: summary.addressLine2,
+        propertyCount: summary._count,
+        averageWeeklyPrice: summary._avg.pricePerWeek,
+        averageCommuteTime: summary._avg.commuteTime,
+        averageScore: summary._avg.averageScore,
+      })),
+      top5Regions: top5Regions.map(region => ({
+        region: region.addressLine2,
+        propertyCount: region._count._all,
+      })),
+    };
   }
 }
 

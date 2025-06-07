@@ -47,6 +47,35 @@ export default async function LocaleLayout({
             `,
           }}
         />
+        {/* Dify Chatbot Configuration */}
+        <Script id="dify-chatbot-config" strategy="afterInteractive">
+          {`
+            window.difyChatbotConfig = {
+              token: 'Pk5JLyWtauKU4b1H',
+              systemVariables: {
+                // user_id: 'YOU CAN DEFINE USER ID HERE',
+                // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+              },
+            }
+          `}
+        </Script>
+        <Script
+          src="https://udify.app/embed.min.js"
+          id="Pk5JLyWtauKU4b1H"
+          strategy="afterInteractive"
+        />
+        {/* Dify Chatbot Custom Styles */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            #dify-chatbot-bubble-button {
+              background-color: #1C64F2 !important;
+            }
+            #dify-chatbot-bubble-window {
+              width: 24rem !important;
+              height: 40rem !important;
+            }
+          `
+        }}></style>
       </head>
       <body>
         <NextIntlClientProvider>

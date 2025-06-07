@@ -7,18 +7,20 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_PROPERTY_USER_PASSWORD=${MYSQL_PROPERTY_USER_PASSWORD}
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - qrent-data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     networks:
       - qrent-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      test:
+        ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
       interval: 5s
       timeout: 5s
       retries: 20
       start_period: 10s
+
   backend:
     build:
       context: .
@@ -30,7 +32,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - API_KEY=${API_KEY}
     ports:
-      - "${EXPOSE_PORT:-3200}:${PORT:-3200}"
+      - '${EXPOSE_PORT:-3200}:${PORT:-3200}'
     depends_on:
       db:
         condition: service_healthy
@@ -42,32 +44,9 @@ services:
       - ./packages/shared:/app/packages/shared
     networks:
       - qrent-network
-  
-  # scraper:
-  #   build:
-  #     context: ./packages/scraper
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - DB_HOST=db
-  #     - DB_PORT=3306
-  #     - DB_USER=${DB_USER:-property_user}
-  #     - DB_PASSWORD=${DB_PASSWORD:-${MYSQL_PROPERTY_USER_PASSWORD}}
-  #     - DB_DATABASE=${MYSQL_DATABASE}
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./packages/scraper:/app/scraper
-  #     - scraper-logs:/app/scraper/logs
-  #   networks:
-  #     - qrent-network
 
 networks:
   qrent-network:
 
 volumes:
   qrent-data:
-  scraper-logs:

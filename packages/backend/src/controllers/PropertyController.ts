@@ -27,6 +27,12 @@ export class PropertyController {
     const properties = await propertyService.getPropertiesByPreferences(preferences);
     res.json(properties);
   }
+
+  async getRegionSummary(req: Request, res: Response) {
+    const regions = req.query.regions as string;
+    const summaries = await propertyService.getRegionSummary(regions);
+    res.json(summaries);
+  }
 }
 
 export const propertyController = new PropertyController();

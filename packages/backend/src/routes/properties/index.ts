@@ -5,7 +5,7 @@ import { Router } from 'express';
 const router = Router();
 
 router.post('/search', catchError(propertyController.fetchProperty));
-
 router.post('/:propertyId/subscribe', catchError(propertyController.handleProperty));
+router.get('/region-summary', catchError(propertyController.getRegionSummary));
 
 export default router;
