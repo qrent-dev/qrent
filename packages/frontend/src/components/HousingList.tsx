@@ -7,7 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
-import { SUBURB_OPTIONS } from './HousingFilter';
+import { FULL_SUBURB_OPTIONS, SUBURB_OPTIONS } from './HousingFilter';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
@@ -16,7 +16,6 @@ const HousingListInEfficiencyFilter = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { filter, updateFilter } = useFilterStore();
-  const [hasMore, setHasMore] = useState(true);
 
   const topRef = useRef();
 
@@ -71,10 +70,10 @@ const HousingListInEfficiencyFilter = () => {
         // if filter area is empty, user didn't choose any region
         // then set region based on school
         if (filter.university == 'UNSW') {
-          requestBody.regions = SUBURB_OPTIONS.unsw.join(' ');
+          requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
         } else {
           // else, USYD
-          requestBody.regions = SUBURB_OPTIONS.usyd.join(' ');
+          requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
         }
       }
 
@@ -150,15 +149,11 @@ const HousingListInEfficiencyFilter = () => {
       });
       const results = await response.json();
 
-      if (results.length == 0) {
-        setHasMore(false);
-      }
+      setTotalPage(Math.ceil(results.propertyCount / 10));
 
-      setTotalPage(Math.ceil(results.length / 10));
+      setListings(results.properties);
 
-      setListings(results);
-
-      console.log(results.length);
+      console.log(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -207,11 +202,7 @@ const HousingListInEfficiencyFilter = () => {
           {currentPage} / {totalPage}
         </div>
 
-        <button
-          onClick={handleNextPage}
-          disabled={!hasMore}
-          className="px-4 py-2 border rounded disabled:opacity-50"
-        >
+        <button onClick={handleNextPage} className="px-4 py-2 border rounded disabled:opacity-50">
           &gt;
         </button>
       </div>
