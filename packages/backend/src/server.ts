@@ -60,7 +60,7 @@ app.use(morgan('dev'));
 
 import rentalLetterRoutes from './routes/rentalLetter';
 
-// app.use(authenticate);
+app.use(authenticate);
 app.use('/api/generate-rental-letter', rentalLetterRoutes);
 app.use('/', router);
 
