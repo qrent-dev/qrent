@@ -38,7 +38,6 @@
 
     "efficiency-filter-des": "快速找到合适房源",
     "here-is-the-guide": "攻略在这里"
-
   },
   "JustLanded": {
     "just-landed": "每日新房",
@@ -281,5 +280,8 @@
     "rental-vocabulary-desc": "澳洲租房常用词汇中英对照表",
     "inspection-checklist": "租房检查清单",
     "inspection-checklist-desc": "租房前检查房屋状况的详细清单"
+  },
+  "DeviceWarning": {
+    "warning": "当前网站仅支持电脑端浏览，请使用电脑访问以获得最佳体验。"
   }
 }
