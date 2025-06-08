@@ -41,7 +41,6 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!Rewrites function is being called!');
     return [
       {
         source: '/api/:path*',
