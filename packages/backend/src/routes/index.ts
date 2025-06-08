@@ -4,12 +4,14 @@ import { catchError } from '@/utils/helper';
 import authRoutes from './auth';
 import userRoutes from './users';
 import propertyRoutes from './properties';
+import rentalLetterRoutes from './rentalLetter';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/properties', propertyRoutes);
+router.use('/api/generate-rental-letter', rentalLetterRoutes);
 
 router.get('/echo', (req: Request, res: Response) => {
   const echo = req.query.echo;
