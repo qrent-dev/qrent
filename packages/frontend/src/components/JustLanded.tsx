@@ -8,27 +8,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslations } from 'next-intl';
 import JustLandedHouseCard from './JustLandedHouseCard';
+import { FULL_SUBURB_OPTIONS } from './HousingFilter';
 
 const JustLanded = () => {
   const [school, setSchool] = useState('unsw');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
-  // const [updateCount, setUpdateCount] = useState(0);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const requestBody = {};
 
-      requestBody.targetSchool = school;
+      if (school === 'unsw') {
+        requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
+      } else {
+        requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
+      }
+
       requestBody.page = 1;
       requestBody.pageSize = 50;
       requestBody.orderBy = [
         {
-          publishedAt: 'desc'
-        }
-      ]
+          publishedAt: 'desc',
+        },
+      ];
 
       console.log(requestBody);
 
