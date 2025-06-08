@@ -11,7 +11,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/properties', propertyRoutes);
-router.use('/api/generate-rental-letter', rentalLetterRoutes);
+router.use('/rental-letter', rentalLetterRoutes);
 
 router.get('/echo', (req: Request, res: Response) => {
   const echo = req.query.echo;
