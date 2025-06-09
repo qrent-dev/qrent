@@ -71,7 +71,9 @@ export default async function LocaleLayout({
             __html: `
             #dify-chatbot-bubble-button {
               background-color: #1C64F2 !important;
-              transform: scale(2) !important;
+              transform: scale(1.6) !important;
+              bottom: 30px !important;
+              right: 30px !important;
             }
             #dify-chatbot-bubble-window {
               width: 24rem !important;
