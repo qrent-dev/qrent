@@ -55,7 +55,10 @@ app.use(morgan('dev'));
 // Routes
 /////////////////////////////////////////////////////////////////////
 
+import rentalLetterRoutes from './routes/rentalLetter';
+
 app.use(authenticate);
+app.use('/api/generate-rental-letter', rentalLetterRoutes);
 app.use('/', router);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
