@@ -64,6 +64,7 @@ export default async function LocaleLayout({
           src="https://udify.app/embed.min.js"
           id="Pk5JLyWtauKU4b1H"
           strategy="afterInteractive"
+          defer
         />
         {/* Dify Chatbot Custom Styles */}
         <style
@@ -71,9 +72,7 @@ export default async function LocaleLayout({
             __html: `
             #dify-chatbot-bubble-button {
               background-color: #1C64F2 !important;
-              transform: scale(1.6) !important;
-              bottom: 30px !important;
-              right: 30px !important;
+              transform: scale(1.5) !important;
             }
             #dify-chatbot-bubble-window {
               width: 24rem !important;
