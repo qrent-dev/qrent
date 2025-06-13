@@ -124,8 +124,8 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
-      requestBody.page = 1;
-      requestBody.pageSize = 1000000;
+      requestBody.page = currentPage;
+      requestBody.pageSize = 10;
 
       requestBody.publishedAt = new Date().toISOString().split('T')[0];
 
@@ -184,7 +184,7 @@ const HousingListInEfficiencyFilter = () => {
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
       {/* Display Current Listings */}
-      {listings.slice((currentPage - 1) * 10, currentPage * 10).map((house, index) => (
+      {listings.map((house, index) => (
         <HouseCard key={index} house={house} />
       ))}
 
