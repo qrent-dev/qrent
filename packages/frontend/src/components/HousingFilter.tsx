@@ -185,11 +185,16 @@ const HousingFilter = () => {
   const t = useTranslations('Search');
 
   const [accordionOpen, setAccordionOpen] = useState(false);
+  const [newTodayOnly, setNewTodayOnly] = useState(false);
 
   const { filter, updateFilter } = useFilterStore();
 
   const unswAreaOptions = [...SUBURB_OPTIONS.unsw];
   const usydAreaOptions = [...SUBURB_OPTIONS.usyd];
+
+  const handleNewTodayCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateFilter({ newToday: e.target.checked });
+  };
 
   const handleCheckboxChange = (option: string) => {
     // Define area mappings - when key is selected, also include the value(s)
@@ -356,6 +361,23 @@ const HousingFilter = () => {
             <option>Studio</option>
             <option>Semi-detached</option>
           </select>
+        </div>
+      </div>
+
+      {/* new today */}
+      <div className="mt-4">
+        <div className="flex items-center gap-2">
+          <label htmlFor="newTodayCheckbox" className="text-lg text-gray-600 font-bold">
+            {t('new-today')}
+          </label>
+
+          <input
+            type="checkbox"
+            id="newTodayCheckbox"
+            checked={filter.newToday}
+            onChange={handleNewTodayCheckboxChange}
+            className="mt-1"
+          />
         </div>
       </div>
 

@@ -21,6 +21,7 @@ export const useFilterStore = create()(
         avaliableDate: 'Any',
         page: 1,
         page_size: 10,
+        newToday: false, // new filter, for merging justlanded and efficiency filter page together
       },
       updateFilter: newFilter => {
         set({ filter: { ...get().filter, ...newFilter } });

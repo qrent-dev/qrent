@@ -1,6 +1,5 @@
 import FooterHandler from '@/src/components/FooterHandler';
 import NavBar from '@/src/components/NavBar';
-import NavBarHandler from '@/src/components/NavBarHandler';
 import { routing } from '@/src/i18n/routing';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
@@ -85,7 +84,7 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider>
-          <NavBarHandler />
+          <NavBar />
           {children}
           <FooterHandler />
         </NextIntlClientProvider>
