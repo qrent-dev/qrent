@@ -2,7 +2,6 @@ import Textbox from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
 import { useFilterStore } from '../store/useFilterStore';
 import { useRouter } from 'next/navigation';
 

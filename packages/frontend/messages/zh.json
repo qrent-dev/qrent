@@ -284,5 +284,12 @@
   },
   "DeviceWarning": {
     "warning": "当前网站仅支持电脑端浏览，请使用电脑访问以获得最佳体验。"
+  },
+  "FilterReport": {
+    "current-num-filtered-listings": "当前筛选房源数量：",
+    "avg-rent": "平均租金：",
+    "avg-time": "平均通勤时间：",
+    "pop-areas": "区域排名（前5名）",
+    "num-of-properties": "房源数量："
   }
 }

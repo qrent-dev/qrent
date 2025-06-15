@@ -1,4 +1,5 @@
 'use client';
+import FilterReport from '@/src/components/FilterReport';
 import HousingFilter from '@/src/components/HousingFilter';
 import HousingListInEfficiencyFilter from '@/src/components/HousingListInEfficiencyFilter';
 import React from 'react';
@@ -13,8 +14,13 @@ const Page = () => {
           <HousingFilter />
         </section>
 
+        {/* filter report */}
+        <section className="flex-[2] bg-gray-50 rounded-lg p-5 shadow-md h-screen sticky top-0 overflow-auto">
+          <FilterReport />
+        </section>
+
         {/* Right: Housing Listings */}
-        <section className="flex-[8] col-span-2 bg-white shadow-lg rounded-lg p-6">
+        <section className="flex-[6] col-span-2 bg-white shadow-lg rounded-lg p-6">
           <HousingListInEfficiencyFilter />
         </section>
       </div>

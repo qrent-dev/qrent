@@ -290,5 +290,12 @@
   },
   "DeviceWarning": {
     "warning": "This website is only supported on desktop. Please use a computer for the best experience."
+  },
+  "FilterReport": {
+    "current-num-filtered-listings": "Current Number of Filtered Listings: ",
+    "avg-rent": "Average Rent: ",
+    "avg-time": "Average Travel Time: ",
+    "pop-areas": "Top 5 Areas: ",
+    "num-of-properties": "Number of Properties: "
   }
 }
