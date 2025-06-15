@@ -216,13 +216,6 @@ class PropertyService {
       where,
       _count: true,
       _avg: { pricePerWeek: true, commuteTime: true, averageScore: true },
-    });
-
-    const top5Regions = await prisma.property.groupBy({
-      by: ['addressLine2'],
-      _count: {
-        _all: true,
-      },
       orderBy: {
         _count: {
           id: 'desc',
@@ -230,6 +223,8 @@ class PropertyService {
       },
       take: 5,
     });
+
+    const totalProperties = summaries.reduce((acc, summary) => acc + summary._count, 0);
 
     return {
       summaries: summaries.map(summary => ({
@@ -239,10 +234,7 @@ class PropertyService {
         averageCommuteTime: summary._avg.commuteTime,
         averageScore: summary._avg.averageScore,
       })),
-      top5Regions: top5Regions.map(region => ({
-        region: region.addressLine2,
-        propertyCount: region._count._all,
-      })),
+      totalProperties,
     };
   }
 }
