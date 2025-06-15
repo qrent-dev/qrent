@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
 import { FULL_SUBURB_OPTIONS, SUBURB_OPTIONS } from './HousingFilter';
+import { filterReportStore } from '../store/filterReportStore';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
@@ -14,6 +15,7 @@ const HousingListInEfficiencyFilter = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { filter, updateFilter } = useFilterStore();
+  const { report, updateReport } = filterReportStore();
 
   const topRef = useRef();
 
@@ -153,6 +155,12 @@ const HousingListInEfficiencyFilter = () => {
       setListings(properties);
 
       setTotalPage(Math.ceil(results.propertyCount / 10));
+      updateReport({
+        currentListings: results.propertyCount,
+        totalListings: results.totalProperties,
+        avgRent: results.averageWeeklyPrice,
+        avgTravelTime: results.averageCommuteTime,
+      });
 
       console.log(results);
     } catch (error) {
