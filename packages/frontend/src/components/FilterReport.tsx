@@ -9,38 +9,34 @@ const FilterReport = () => {
   const t = useTranslations('FilterReport');
   const { report } = filterReportStore();
 
-  const [data, setData] = useState(null);
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
-    fetch('/api/properties/region-summary?regions=')
-      .then(res => res.json())
-      .then(result => setData(result))
-      .catch(console.error);
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/properties/region-summary?regions=', {
+          method: 'GET',
+        });
+        const data = await response.json();
+        setResult(data);
+      } catch (error) {
+        console.error('Error fetching report', error);
+      }
+    }
+
+    fetchData();
   }, []);
 
-  if (data == null) {
-    return;
+  if (!result) {
+    return <div>loading</div>;
   }
-
-  const top5Details = data.top5Regions.map(regionItem => {
-    const matchedSummary = data.summaries.find(s => s.region === regionItem.region);
-
-    return {
-      regionName: regionItem.region.split('-nsw')[0],
-      propertyCount: regionItem.propertyCount,
-      averageWeeklyPrice: matchedSummary?.averageWeeklyPrice ?? null,
-      averageCommuteTime: matchedSummary?.averageCommuteTime ?? null,
-    };
-  });
-
-  console.log(top5Details);
 
   return (
     <div>
       <div className="w-full bg-white rounded-lg shadow p-6 flex flex-col gap-6">
         {/* Top Section: Row layout */}
         <div className="flex flex-col text-gray-800">
-          <div className="block border-b-2 border-gray-200 w-max pb-2 text-md font-medium">
+          <div className="border-b-2 border-gray-200 w-max pb-2 text-md font-medium flex flex-col">
             {t('current-num-filtered-listings')}
             <span className="text-blue-primary text-2xl">
               {report.currentListings} / {report.totalListings}
@@ -62,15 +58,13 @@ const FilterReport = () => {
         <h3 className="text-lg font-semibold text-gray-800">{t('pop-areas')}</h3>
 
         <div className="flex flex-col divide-y divide-gray-200">
-          {top5Details.map((item, index) => (
+          {result.summaries.map((item, index) => (
             <div key={index} className="py-4">
-              <div className="text-md font-semibold text-gray-800">
-                {item.regionName.toUpperCase()}
-              </div>
+              <div className="text-md font-semibold text-gray-800">{item.region.toUpperCase()}</div>
               <div className="text-sm text-gray-700 mt-1">
                 {t('num-of-properties')}
                 {item.propertyCount} (
-                {((item.propertyCount / report.totalListings) * 100).toFixed(1)}%)
+                {((item.propertyCount / result.totalProperties) * 100).toFixed(1)}%)
               </div>
               <div className="text-sm text-gray-700">
                 {t('avg-rent')}${item.averageWeeklyPrice?.toFixed(0)}/w
