@@ -32,7 +32,8 @@
     "max": "Max",
     "save": "Save",
     "price": "Price",
-    "area": "Area"
+    "area": "Area",
+    "new-today": "New Today"
   },
   "HeroButton": {
     "rental-guide": "Rental Guide",
@@ -43,7 +44,7 @@
     "resource-center-des": "Rental related resources",
     "efficiency-filter": "Efficient Filtering",
     "efficiency-filter-des": "Find suitable properties quickly",
-    "here-is-the-guide": "Here is the guide!"
+    "guide": "Tips here"
   },
   "JustLanded": {
     "just-landed": "Just Landed",

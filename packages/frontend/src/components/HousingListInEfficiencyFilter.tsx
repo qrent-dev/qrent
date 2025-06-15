@@ -122,6 +122,11 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
+      if (filter.newToday) {
+        // if the user only want to see the housing today
+        requestBody.publishedAt = new Date().toISOString().split('T')[0];
+      }
+
       requestBody.page = currentPage;
       requestBody.pageSize = 10;
 

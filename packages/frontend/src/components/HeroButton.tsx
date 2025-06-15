@@ -11,7 +11,7 @@ const HeroButton = () => {
 
   const checkedItemsRentalGuide = useRentalGuideProgressStore(state => state.checkedItem);
   const checkedItemsPrepareDoc = usePrepareDocProgressStore(state => state.checkedItem);
-  
+
   // 主要按钮（有进度条）
   const mainNavItems = [
     {
@@ -94,7 +94,7 @@ const HeroButton = () => {
           >
             {item.highlight && (
               <div className="absolute -top-3 -left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-md animate-pulse">
-                攻略在这里
+                {t('guide')}
               </div>
             )}
             {/* Icon */}
