@@ -39,7 +39,7 @@ const FilterReport = () => {
     <div>
       <div className="w-full bg-white rounded-lg shadow p-6 flex flex-col gap-6">
         {/* Top Section: Row layout */}
-        <div className="flex flex-wrap text-gray-800">
+        <div className="flex flex-col text-gray-800">
           <div className="block border-b-2 border-gray-200 w-max pb-2 text-md font-medium">
             {t('current-num-filtered-listings')}
             <span className="text-blue-primary text-2xl">
