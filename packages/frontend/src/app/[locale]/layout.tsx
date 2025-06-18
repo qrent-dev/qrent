@@ -1,6 +1,5 @@
 import FooterHandler from '@/src/components/FooterHandler';
 import NavBar from '@/src/components/NavBar';
-import NavBarHandler from '@/src/components/NavBarHandler';
 import { routing } from '@/src/i18n/routing';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
@@ -64,6 +63,7 @@ export default async function LocaleLayout({
           src="https://udify.app/embed.min.js"
           id="Pk5JLyWtauKU4b1H"
           strategy="afterInteractive"
+          defer
         />
         {/* Dify Chatbot Custom Styles */}
         <style
@@ -71,6 +71,8 @@ export default async function LocaleLayout({
             __html: `
             #dify-chatbot-bubble-button {
               background-color: #1C64F2 !important;
+              transform: scale(1.5) !important;
+
             }
             #dify-chatbot-bubble-window {
               width: 24rem !important;
@@ -82,7 +84,7 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider>
-          <NavBarHandler />
+          <NavBar />
           {children}
           <FooterHandler />
         </NextIntlClientProvider>

@@ -25,7 +25,8 @@
     "max": "最多",
     "save": "保存",
     "price": "价格",
-    "area": "地区"
+    "area": "地区",
+    "new-today": "今日上新"
   },
   "HeroButton": {
     "rental-guide": "租房指南",
@@ -37,7 +38,7 @@
     "efficiency-filter": "高效筛房",
 
     "efficiency-filter-des": "快速找到合适房源",
-    "here-is-the-guide": "攻略在这里"
+    "guide": "攻略在这里"
   },
   "JustLanded": {
     "just-landed": "每日新房",
@@ -283,5 +284,12 @@
   },
   "DeviceWarning": {
     "warning": "当前网站仅支持电脑端浏览，请使用电脑访问以获得最佳体验。"
+  },
+  "FilterReport": {
+    "current-num-filtered-listings": "当前筛选房源数量：",
+    "avg-rent": "平均租金：",
+    "avg-time": "平均通勤时间：",
+    "pop-areas": "区域排名（前5名）",
+    "num-of-properties": "房源数量："
   }
 }

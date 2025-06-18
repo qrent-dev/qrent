@@ -74,13 +74,13 @@ export default function ResourceCenter() {
               </div>
               
               <div className="flex flex-col items-center">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">加入租房社群</h2>
-                <p className="text-center text-gray-600 text-base mb-8">有问题实时解答！</p>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">💬 添加专属顾问</h2>
+                <p className="text-center text-gray-600 text-base mb-8">有疑问我来答，还能拉你进群哦～</p>
                 
                 <div className="border-2 border-[#4D8BF8] rounded-xl px-5 py-6 w-96 flex flex-col items-center justify-center mb-6 relative bg-white">
                   <Image 
-                    src="/resources/wechat-group-0417.jpg" 
-                    alt="Qrent租房交流群" 
+                    src="/resources/personal-wechat.jpg" 
+                    alt="Qrent专属顾问微信" 
                     width={320}
                     height={320}
                     className="object-contain"
@@ -88,8 +88,8 @@ export default function ResourceCenter() {
                   />
                 </div>
                 
-                <div className="bg-blue-50 rounded-full px-6 py-3">
-                  <p className="text-center text-blue-600 text-base font-medium">扫码加入Qrent租房交流群</p>
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-full px-6 py-3 border border-blue-200">
+                  <p className="text-center text-blue-600 text-base font-medium">🔥 扫码添加我，解答问题+拉群</p>
                 </div>
               </div>
             </div>

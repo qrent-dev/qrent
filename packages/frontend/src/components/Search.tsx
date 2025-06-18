@@ -2,7 +2,6 @@ import Textbox from './priceDropDown';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
 import { useFilterStore } from '../store/useFilterStore';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +10,11 @@ export default function Search() {
 
   const t = useTranslations('Search');
   const router = useRouter();
+
+  const handleGoClick = () => {
+    updateFilter({ newToday: false });
+    router.push('findAHome');
+  };
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // if the clicked element is a form control, don't navigate
@@ -119,8 +123,11 @@ export default function Search() {
 
             <div className="flex gap-4">
               <MoreFilterModal filter={filter} setFilter={updateFilter} />
-              <button className="bg-blue-primary text-white px-4 py-1 rounded mt-4">
-                <Link href="/findAHome">Go</Link>
+              <button
+                className="bg-blue-primary text-white px-4 py-1 rounded mt-4"
+                onClick={handleGoClick}
+              >
+                Go
               </button>
             </div>
           </div>

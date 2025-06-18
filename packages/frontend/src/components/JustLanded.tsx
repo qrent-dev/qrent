@@ -9,12 +9,18 @@ import { faHome, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-ico
 import { useTranslations } from 'next-intl';
 import JustLandedHouseCard from './JustLandedHouseCard';
 import { FULL_SUBURB_OPTIONS } from './HousingFilter';
+import { useFilterStore } from '../store/useFilterStore';
 
 const JustLanded = () => {
   const [school, setSchool] = useState('unsw');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
+  const { filter, updateFilter } = useFilterStore();
+
+  const handleViewAllClick = () => {
+    updateFilter({ newToday: true });
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -101,35 +107,17 @@ const JustLanded = () => {
               USYD
             </button>
           </div>
-          {/* Subscribe Button */}
-          {/* <button className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
-            <FontAwesomeIcon icon={faBell} />
-            {t('subscribe')}
-          </button> */}
         </div>
-        {/* <div className="ml-auto flex items-center gap-3">
-          <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">
-            {t('updates')}: {updateCount}
-          </span>
-        </div> */}
-        <Link
-          href="/justLanded"
-          className="text-blue-primary hover:underline flex items-center ml-2"
-        >
-          {t('view-all')} <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+
+        <Link href="findAHome" legacyBehavior>
+          <a
+            className="text-blue-primary hover:underline flex items-center ml-2"
+            onClick={handleViewAllClick}
+          >
+            {t('view-all')} <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+          </a>
         </Link>
       </div>
-      {/* Loading State */}
-      {loading && (
-        <div className="flex items-center gap-2 text-gray-500">
-          <FontAwesomeIcon icon={faSpinner} spin />
-          Loading latest listings...
-        </div>
-      )}
-
-      {/* Content */}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
       <div className="max-w-screen-lg mx-auto mt-10 mb-20 px-6 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -32,7 +32,8 @@
     "max": "Max",
     "save": "Save",
     "price": "Price",
-    "area": "Area"
+    "area": "Area",
+    "new-today": "New Today"
   },
   "HeroButton": {
     "rental-guide": "Rental Guide",
@@ -43,7 +44,7 @@
     "resource-center-des": "Rental related resources",
     "efficiency-filter": "Efficient Filtering",
     "efficiency-filter-des": "Find suitable properties quickly",
-    "here-is-the-guide": "Here is the guide!"
+    "guide": "Tips here"
   },
   "JustLanded": {
     "just-landed": "Just Landed",
@@ -289,5 +290,12 @@
   },
   "DeviceWarning": {
     "warning": "This website is only supported on desktop. Please use a computer for the best experience."
+  },
+  "FilterReport": {
+    "current-num-filtered-listings": "Current Number of Filtered Listings: ",
+    "avg-rent": "Average Rent: ",
+    "avg-time": "Average Travel Time: ",
+    "pop-areas": "Top 5 Areas: ",
+    "num-of-properties": "Number of Properties: "
   }
 }

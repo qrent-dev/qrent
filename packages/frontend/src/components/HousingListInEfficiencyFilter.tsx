@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
 import { FULL_SUBURB_OPTIONS, SUBURB_OPTIONS } from './HousingFilter';
+import { filterReportStore } from '../store/filterReportStore';
 
 const HousingListInEfficiencyFilter = () => {
   const [listings, setListings] = useState([]);
@@ -14,6 +15,7 @@ const HousingListInEfficiencyFilter = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const { filter, updateFilter } = useFilterStore();
+  const { report, updateReport } = filterReportStore();
 
   const topRef = useRef();
 
@@ -122,7 +124,12 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
-      requestBody.page = 1;
+      if (filter.newToday) {
+        // if the user only want to see the housing today
+        requestBody.publishedAt = new Date().toISOString().split('T')[0];
+      }
+
+      requestBody.page = currentPage;
       requestBody.pageSize = 10;
 
       requestBody.orderBy = [
@@ -148,6 +155,12 @@ const HousingListInEfficiencyFilter = () => {
       setListings(properties);
 
       setTotalPage(Math.ceil(results.propertyCount / 10));
+      updateReport({
+        currentListings: results.propertyCount,
+        totalListings: results.totalProperties,
+        avgRent: results.averageWeeklyPrice,
+        avgTravelTime: results.averageCommuteTime,
+      });
 
       console.log(results);
     } catch (error) {
@@ -180,7 +193,7 @@ const HousingListInEfficiencyFilter = () => {
       {!loading && !error && listings.length === 0 && <p>No new listings available.</p>}
 
       {/* Display Current Listings */}
-      {listings.slice((currentPage - 1) * 10, currentPage * 10).map((house, index) => (
+      {listings.map((house, index) => (
         <HouseCard key={index} house={house} />
       ))}
 
