@@ -13,19 +13,43 @@ export default function DropDownList() {
       <DropdownTrigger>
         <Button className="font-serif text-xl ">
           {userInfo?.name ? (
-            <span>{userInfo.name}</span> // Show the name if logged in
+            <span
+              className="max-w-[100px] truncate overflow-hidden whitespace-nowrap"
+              title={userInfo.name}
+            >
+              {userInfo.name.toUpperCase()}
+            </span>
           ) : (
             <User className="w-6 h-6" /> // Default icon if not logged in
           )}
         </Button>
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions" className="bg-white shadow-md rounded-lg">
-        <DropdownItem key="login" href="/login" className="font-sans ">
-          {t('login')}
-        </DropdownItem>
-        <DropdownItem key="signup" href="/signup" className="font-sans ">
-          {t('signup')}
-        </DropdownItem>
+        {userInfo?.name ? (
+          <>
+            <DropdownItem key="profile" href="/profile" className="font-sans">
+              {t('profile')}
+            </DropdownItem>
+            <DropdownItem key="findAHome" href="/findAHome" className="font-sans">
+              {t('efficiency-filter')}
+            </DropdownItem>
+            <DropdownItem key="rentalGuide" href="/rentalGuide" className="font-sans">
+              {t('rental-guide')}
+            </DropdownItem>
+            <DropdownItem key="prepareDocuments" href="/prepareDocuments" className="font-sans">
+              {t('prepare-documents')}
+            </DropdownItem>
+          </>
+        ) : (
+          <>
+            <DropdownItem key="login" href="/login" className="font-sans">
+              {t('login')}
+            </DropdownItem>
+            <DropdownItem key="signup" href="/signup" className="font-sans">
+              {t('signup')}
+            </DropdownItem>
+          </>
+        )}
       </DropdownMenu>
     </Dropdown>
   );
