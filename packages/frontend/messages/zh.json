@@ -7,7 +7,18 @@
     "prepare-documents": "申请材料",
     "efficiency-filter": "高效筛房"
   },
-  "DropDownList": { "login": "登录", "signup": "注册" },
+  "DropDownList": {
+    "login": "登录",
+    "signup": "注册",
+    "rental-guide": "租房攻略",
+    "prepare-documents": "申请材料",
+    "efficiency-filter": "高效筛房",
+    "profile": "个人主页"
+  },
+  "Profile": {
+    "profile": "个人主页",
+    "save": "我的收藏"
+  },
   "Footer": { "about": "关于我们", "meet-our-team": "我们的团队", "get-in-touch": "联系我们" },
   "Search": {
     "university": "大学",

@@ -9,7 +9,15 @@
   },
   "DropDownList": {
     "login": "Login",
-    "signup": "SignUp"
+    "signup": "SignUp",
+    "rental-guide": "Rental-Guide",
+    "prepare-documents": "Prepare-documents",
+    "efficiency-filter": "Efficiency-Filter",
+    "profile": "My profile"
+  },
+  "Profile": {
+    "profile": "My profile",
+    "save": "My Favorites"
   },
   "Footer": {
     "about": "About",
