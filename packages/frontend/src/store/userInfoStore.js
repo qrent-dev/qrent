@@ -3,10 +3,12 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 export const useUserStore = create()(
   persist(
-    set => ({
-      userInfo: null,
-      setUser: userInfo => set({ userInfo }),
-      clearUser: () => set({ userInfo: null }),
+    (set, get) => ({
+      userInfo: {
+        name: '',
+        email: '',
+      },
+      setUser: userInfo => set({ userInfo: { ...get().userInfo, ...userInfo } }),
     }),
     {
       name: 'user-info', // Name for localStorage
