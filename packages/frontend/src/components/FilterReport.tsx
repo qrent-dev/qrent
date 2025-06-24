@@ -9,28 +9,6 @@ const FilterReport = () => {
   const t = useTranslations('FilterReport');
   const { report } = filterReportStore();
 
-  const [result, setResult] = useState(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch('/api/properties/region-summary?regions=', {
-          method: 'GET',
-        });
-        const data = await response.json();
-        setResult(data);
-      } catch (error) {
-        console.error('Error fetching report', error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  if (!result) {
-    return <div>loading</div>;
-  }
-
   return (
     <div>
       <div className="w-full bg-white rounded-lg shadow p-6 flex flex-col gap-6">
@@ -58,16 +36,18 @@ const FilterReport = () => {
         <h3 className="text-lg font-semibold text-gray-800">{t('pop-areas')}</h3>
 
         <div className="flex flex-col divide-y divide-gray-200">
-          {result.summaries.map((item, index) => (
+          {report.topRegions.map((item, index) => (
             <div key={index} className="py-4">
-              <div className="text-md font-semibold text-gray-800">{item.region.toUpperCase()}</div>
+              <div className="text-md font-semibold text-gray-800">
+                {item.region.toUpperCase().split('-')[0]}
+              </div>
               <div className="text-sm text-gray-700 mt-1">
                 {t('num-of-properties')}
                 {item.propertyCount} (
-                {((item.propertyCount / result.totalProperties) * 100).toFixed(1)}%)
+                {((item.propertyCount / report.currentListings) * 100).toFixed(1)}%)
               </div>
               <div className="text-sm text-gray-700">
-                {t('avg-rent')}${item.averageWeeklyPrice?.toFixed(0)}/w
+                {t('avg-rent')}${item.averagePrice?.toFixed(0)}/w
               </div>
               <div className="text-sm text-gray-700">
                 {t('avg-time')}
