@@ -10,7 +10,6 @@ postcodes_unsw = [
     "mascot-nsw-2020",
     "rosebery-nsw-2018",
     "zetland-nsw-2017",
-    "waterloo-nsw-2017",
 ]
 
 # Postcodes for target areas in usyd
@@ -21,8 +20,6 @@ postcodes_usyd = [
     "burwood-nsw-2134",
     "newtown-nsw-2042",
     "glebe-nsw-2037",
-    "mascot-nsw-2020",
-    "zetland-nsw-2017",
     "waterloo-nsw-2017",
     "chippendale-nsw-2008",
     "ultimo-nsw-2007",

@@ -8,7 +8,9 @@
     "dev:backend": "pnpm --filter backend dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:backend": "pnpm --filter backend test"
+    "test:backend": "pnpm --filter backend test",
+    "init-db": "./scripts/init-db.sh",
+    "setup-full-db": "./scripts/setup-full-db.sh"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
