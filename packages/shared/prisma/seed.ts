@@ -28,12 +28,30 @@ function parseAddressLine2(addressLine2: string) {
   return null;
 }
 
-async function seedSchools() {
-  console.log('setting...');
+async function cleanDatabase() {
+  console.log('clean...');
+  
+  await (prisma as any).propertySchool.deleteMany();
+  console.log(' property_school');
+  
+  await (prisma as any).property.deleteMany();
+  console.log('properties');
+  
+  await (prisma as any).region.deleteMany();
+  console.log('regions');
   
   await (prisma as any).school.deleteMany();
+  console.log('schools ');
   
   await prisma.$executeRaw`ALTER TABLE schools AUTO_INCREMENT = 1`;
+  await prisma.$executeRaw`ALTER TABLE regions AUTO_INCREMENT = 1`;
+  await prisma.$executeRaw`ALTER TABLE properties AUTO_INCREMENT = 1`;
+  
+  console.log('cleaned');
+}
+
+async function seedSchools() {
+  console.log('starting...');
   
   const schools = [
     { id: 1, name: 'UNSW' },
@@ -46,15 +64,11 @@ async function seedSchools() {
     });
   }
   
-  console.log('school complete');
+  console.log('school finish');
 }
 
 async function seedRegions() {
-  console.log('region...');
-  
-  await (prisma as any).region.deleteMany();
-  
-  await prisma.$executeRaw`ALTER TABLE regions AUTO_INCREMENT = 1`;
+  console.log('init...');
   
   const propertyDataPath = path.join(__dirname, '../../scraper/property_data_250623.json');
   const propertyData: PropertyData[] = JSON.parse(fs.readFileSync(propertyDataPath, 'utf8'));
@@ -71,7 +85,7 @@ async function seedRegions() {
     }
   }
   
-  console.log(`found ${uniqueRegions.size}`);
+  console.log(`find ${uniqueRegions.size} region`);
   
   const regionsArray = Array.from(uniqueRegions.values()).sort((a, b) => a.name.localeCompare(b.name));
   
@@ -87,21 +101,22 @@ async function seedRegions() {
     });
     
     if ((i + 1) % 10 === 0) {
-      console.log(`已插入 ${i + 1}/${regionsArray.length} 个区域`);
+      console.log(`insert ${i + 1}/${regionsArray.length} `);
     }
   }
   
-  console.log('finsh');
+  console.log('finish region');
 }
 
 async function main() {
   try {
-    console.log('starting databse..');
+    
+    await cleanDatabase();
     
     await seedSchools();
+    
     await seedRegions();
     
-    console.log('finsih！');
   } catch (error) {
     console.error('error', error);
     throw error;
