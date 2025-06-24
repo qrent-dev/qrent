@@ -84,26 +84,37 @@ def update_commute_time(university):
 
     data = pd.read_csv(input_file)
 
-    missing_commute = data[data['commuteTime'].isna()]
+    if 'commuteTime_UNSW' not in data.columns:
+        data['commuteTime_UNSW'] = None
+    if 'commuteTime_USYD' not in data.columns:
+        data['commuteTime_USYD'] = None
 
-    if university.lower() == 'unsw':
-        destination_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
-    elif university.lower() == 'usyd':
-        destination_coord = "151.18672:-33.888333:EPSG:4326"  # USYD
-    else:
-        raise ValueError("Unsupported university. Please use 'unsw' or 'usyd'.")
+    missing_commute = data[
+        data['commuteTime_UNSW'].isna() | data['commuteTime_USYD'].isna()
+    ]
 
+    unsw_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
+    usyd_coord = "151.18672:-33.888333:EPSG:4326"  # USYD
 
-    for index, row in tqdm(missing_commute.iterrows(), total=len(missing_commute), desc="Updating commute time"):
+    for index, row in tqdm(missing_commute.iterrows(), total=len(missing_commute), desc="Updating commute time to both universities"):
         origin_address = row['addressLine1']
         origin_coord = address_to_coord(origin_address)
 
         if origin_coord:
-
-            travel_time = find_shortest_travel_time(origin_coord, destination_coord, time_="0900")
-            data.loc[index, 'commuteTime'] = travel_time if travel_time is not None else "N/A"
+            if pd.isna(row['commuteTime_UNSW']):
+                travel_time_unsw = find_shortest_travel_time(origin_coord, unsw_coord, time_="0900")
+                data.loc[index, 'commuteTime_UNSW'] = travel_time_unsw if travel_time_unsw is not None else 0
+                print(f"UNSW commute time: {travel_time_unsw} minutes")
+            
+            if pd.isna(row['commuteTime_USYD']):
+                travel_time_usyd = find_shortest_travel_time(origin_coord, usyd_coord, time_="0900")
+                data.loc[index, 'commuteTime_USYD'] = travel_time_usyd if travel_time_usyd is not None else 0
+                print(f"USYD commute time: {travel_time_usyd} minutes")
         else:
-            data.loc[index, 'commuteTime'] = 0
+            if pd.isna(row['commuteTime_UNSW']):
+                data.loc[index, 'commuteTime_UNSW'] = 0
+            if pd.isna(row['commuteTime_USYD']):
+                data.loc[index, 'commuteTime_USYD'] = 0
 
     data.to_csv(output_file, index=False)
     print(f"save data to:{output_file}")
