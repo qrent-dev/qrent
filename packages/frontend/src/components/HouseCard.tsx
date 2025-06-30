@@ -149,7 +149,7 @@ const HouseCard = ({ house }) => {
         </span>
       </div>
 
-      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
         {scoreText}
       </span>
 
