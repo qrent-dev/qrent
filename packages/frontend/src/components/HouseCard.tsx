@@ -121,8 +121,17 @@ const HouseCard = ({ house }) => {
             {house.addressLine1 || 'Unknown Address'}
           </h3>
           {propertyType != '' && (
-            <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-              <span className="inline-block rounded-full text-md">{propertyType}</span>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+                <span className="inline-block rounded-full text-md">{propertyType}</span>
+              </div>
+              <button onClick={toggleFavorite} className="focus:outline-none">
+                <FaHeart
+                  className={`text-2xl transition-colors duration-200 ${
+                    isFavorited ? 'text-pink-500' : 'text-gray-300'
+                  }`}
+                />
+              </button>
             </div>
           )}
         </div>
@@ -143,14 +152,6 @@ const HouseCard = ({ house }) => {
       <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
         {scoreText}
       </span>
-
-      <button onClick={toggleFavorite} className="absolute top-5 right-4 z-10">
-        <FaHeart
-          className={`text-xl transition-colors duration-200 ${
-            isFavorited ? 'text-pink-500' : 'text-gray-300'
-          }`}
-        />
-      </button>
 
       <div className="flex space-x-4 mt-4">
         {house.bedroomCount != 0 && (
