@@ -41,7 +41,8 @@
     "save": "Save",
     "price": "Price",
     "area": "Area",
-    "new-today": "New Today"
+    "new-today": "New Today",
+    "my-fav": "My Favorites"
   },
   "HeroButton": {
     "rental-guide": "Rental Guide",

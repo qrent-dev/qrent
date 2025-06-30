@@ -37,7 +37,8 @@
     "save": "保存",
     "price": "价格",
     "area": "地区",
-    "new-today": "今日上新"
+    "new-today": "今日上新",
+    "my-fav": "我的收藏"
   },
   "HeroButton": {
     "rental-guide": "租房指南",
