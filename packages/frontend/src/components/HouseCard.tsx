@@ -3,10 +3,18 @@
 
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import React from 'react';
-import { FaBath, FaBed, FaCalendarAlt, FaCar, FaMapMarkerAlt, FaRegClock } from 'react-icons/fa';
+import React, { useState } from 'react';
+import {
+  FaBath,
+  FaBed,
+  FaCalendarAlt,
+  FaCar,
+  FaMapMarkerAlt,
+  FaRegClock,
+  FaHeart,
+} from 'react-icons/fa';
 
-const JustLandedHouseCard = ({ house }) => {
+const HouseCard = ({ house }) => {
   let locale = '';
   if (usePathname().startsWith('/en')) {
     locale = 'en';
@@ -15,6 +23,14 @@ const JustLandedHouseCard = ({ house }) => {
   }
 
   const t = useTranslations('HouseCard');
+
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const toggleFavorite = e => {
+    e.preventDefault();
+    setIsFavorited(!isFavorited);
+  };
+
   const price = house.pricePerWeek;
   const scoreValue = house.averageScore.toFixed(1);
   if (house.addressLine1 == null) {
@@ -124,9 +140,17 @@ const JustLandedHouseCard = ({ house }) => {
         </span>
       </div>
 
-      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
         {scoreText}
       </span>
+
+      <button onClick={toggleFavorite} className="absolute top-5 right-4 z-10">
+        <FaHeart
+          className={`text-xl transition-colors duration-200 ${
+            isFavorited ? 'text-pink-500' : 'text-gray-300'
+          }`}
+        />
+      </button>
 
       <div className="flex space-x-4 mt-4">
         {house.bedroomCount != 0 && (
@@ -179,4 +203,4 @@ const JustLandedHouseCard = ({ house }) => {
   );
 };
 
-export default JustLandedHouseCard;
+export default HouseCard;

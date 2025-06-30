@@ -1,5 +1,6 @@
 'use client';
 
+import { useFilterStore } from '@/src/store/useFilterStore';
 import { useUserStore } from '@/src/store/userInfoStore';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -9,11 +10,17 @@ export default function ProfilePage() {
   const { userInfo } = useUserStore();
   const t = useTranslations('Profile');
   const router = useRouter();
+  const { filter, updateFilter } = useFilterStore();
 
   const user = {
     name: userInfo.name,
     email: userInfo.email,
     avatarUrl: userInfo.avatarUrl || 'https://www.gravatar.com/avatar/?d=mp',
+  };
+
+  const handleSaveClick = () => {
+    updateFilter({ myFav: true });
+    router.push('/findAHome');
   };
 
   return (
@@ -35,7 +42,7 @@ export default function ProfilePage() {
       <div className="mt-8 space-y-4">
         <button
           className="w-full bg-blue-primary hover:bg-blue-900 text-white py-2 rounded-lg transition"
-          onClick={() => router.push('/findAHome')}
+          onClick={handleSaveClick}
         >
           {t('save')}
         </button>

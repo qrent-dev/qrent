@@ -41,7 +41,8 @@
     "save": "Save",
     "price": "Price",
     "area": "Area",
-    "new-today": "New Today"
+    "new-today": "New Today",
+    "my-fav": "My Favorites"
   },
   "HeroButton": {
     "rental-guide": "Rental Guide",
@@ -203,7 +204,30 @@
     "relatives": "Relatives",
     "other-information": "Other Information",
     "other-info-ph": "e.g. Likes to cook, works night shifts",
-    "feature-in-progress": "This feature is currently under development and not yet functional."
+    "feature-in-progress": "This feature is currently under development and not yet functional.",
+    "dob": "Date of Birth",
+    "contact-info": "Contact Info",
+    "acc-balance": "Account Balance",
+    "acc-bal-ph": "Please enter the account balance (e.g. $5,000)",
+    "income": "Income Source and Amount",
+    "income-ph": "e.g. Part-time job $300 per week",
+    "scholar-info": "Scholarship Name and Amount",
+    "scholar-ph": "e.g. UNSW Scholarship $10,000",
+    "house-add": "House Address",
+    "house-add-ph": "Please enter the address.",
+    "rental-dur": "Rental Duration",
+    "rental-ph": "e.g. 12 month",
+    "rent": "Rent ($/week)",
+    "landlords-ref": "Landlord Reference Letter (Provided)",
+    "extra-msg": "Extra Message",
+    "extra-ph": "e.g. Paid rent on time, kept the place clean, maintained a good relationship with the landlord, etc.",
+    "docs": "6. Required Documents",
+    "ess-docs": "Essential Documents",
+    "opt-docs": "Optional Supporting Documents",
+    "proof-enr": "Proof of Enrollment",
+    "ref-letter": "Reference Letter",
+    "emp-proof": "Employment Proof",
+    "oth-docs": "Other Supporting Documents"
   },
   "LanguageSwitcher": {
     "english": "English",
