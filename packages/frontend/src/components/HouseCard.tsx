@@ -121,8 +121,17 @@ const HouseCard = ({ house }) => {
             {house.addressLine1 || 'Unknown Address'}
           </h3>
           {propertyType != '' && (
-            <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
-              <span className="inline-block rounded-full text-md">{propertyType}</span>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
+                <span className="inline-block rounded-full text-md">{propertyType}</span>
+              </div>
+              <button onClick={toggleFavorite} className="focus:outline-none">
+                <FaHeart
+                  className={`text-2xl transition-colors duration-200 ${
+                    isFavorited ? 'text-pink-500' : 'text-gray-300'
+                  }`}
+                />
+              </button>
             </div>
           )}
         </div>
