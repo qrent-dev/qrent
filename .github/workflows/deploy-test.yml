@@ -1,0 +1,107 @@
+name: Deploy to Test Environment
+
+on:
+  push:
+    branches: [ v2.0 ]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build backend
+      run: |
+        cd packages/backend
+        pnpm build
+
+    - name: Build frontend
+      env:
+        NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+      run: |
+        cd packages/frontend
+        pnpm build
+
+    - name: Deploy to DigitalOcean
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: 22
+        script: |
+          # 进入项目目录
+          cd /qrent
+          
+          # 拉取最新代码
+          git fetch origin
+          git checkout v2.0
+          git pull origin v2.0
+          
+          # 停止现有服务
+          docker-compose down || true
+          
+          # 更新环境变量
+          cat > .env << EOF
+          DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          HOST="${{ vars.HOST_BIND }}"
+          PORT="${{ vars.PORT }}"
+          EXPOSE_PORT="${{ vars.EXPOSE_PORT }}"
+          JWT_SECRET="${{ secrets.JWT_SECRET }}"
+          API_KEY="${{ secrets.API_KEY }}"
+          NSW_TRANSPORT_API_KEY="${{ secrets.NSW_TRANSPORT_API_KEY }}"
+          PROPERTY_RATING_API_KEY="${{ secrets.PROPERTY_RATING_API_KEY }}"
+          MYSQL_DATABASE="${{ vars.MYSQL_DATABASE }}"
+          MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          MYSQL_PROPERTY_USER_PASSWORD="${{ secrets.MYSQL_PROPERTY_USER_PASSWORD }}"
+          NODE_ENV="${{ vars.NODE_ENV }}"
+          DB_HOST="${{ vars.DB_HOST }}"
+          DB_USER="${{ vars.DB_USER }}"
+          DB_PASSWORD="${{ secrets.MYSQL_PROPERTY_USER_PASSWORD }}"
+          DB_DATABASE="${{ vars.DB_DATABASE }}"
+          DB_PORT="${{ vars.DB_PORT }}"
+          NEXT_PUBLIC_BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
+          EOF
+          
+          # 重新构建并启动服务
+          docker-compose build --no-cache
+          docker-compose up -d
+          
+          # 等待服务启动
+          sleep 30
+          
+          # 检查服务状态
+          docker-compose ps
+          
+          # 健康检查
+          curl -f http://localhost:3201/health || echo "Backend health check failed"
+          curl -f http://localhost:3000 || echo "Frontend health check failed"
+          
+          # 显示日志
+          docker-compose logs --tail=20
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment to test environment successful!"
+          echo "🌐 Frontend: http://209.38.19.70:3000"
+          echo "🔗 Backend: http://209.38.19.70:3201"
+        else
+          echo "❌ Deployment failed!"
+        fi
