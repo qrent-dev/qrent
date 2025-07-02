@@ -119,6 +119,9 @@ const LetterForm = () => {
     });
   };
 
+  const [requiredDocs, setRequiredDocs] = useState([]);
+  const [optionalDocs, setOptionalDocs] = useState([]);
+
   const proofDocsOpts = [t('bank-statement'), t('income-proof'), t('property-proof'), t('tax')];
 
   const handleProofDocsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,6 +168,24 @@ const LetterForm = () => {
 
   const [showFlatmate, setShowFlatmate] = useState(false);
 
+  type RentalExperience = {
+    address: string;
+    duration: string;
+    weeklyRent: string;
+    hasReference: boolean;
+    notes: string;
+  };
+
+  const [selectedDocs, setSelectedDocs] = useState([]);
+
+  const handleDocChange = value => {
+    if (selectedDocs.includes(value)) {
+      setSelectedDocs(selectedDocs.filter(doc => doc !== value));
+    } else {
+      setSelectedDocs([...selectedDocs, value]);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex space-x-4 mb-6">
@@ -195,7 +216,7 @@ const LetterForm = () => {
                 className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
                 onClick={() => toggleAccordion(1)}
               >
-                <span>{t('student-info')}</span>
+                <span>1. {t('student-info')}</span>
                 <ChevronDown
                   className={`w-5 h-5 transform transition-transform duration-300 ${
                     openAccordion === 1 ? 'rotate-180' : 'rotate-0'
@@ -239,6 +260,25 @@ const LetterForm = () => {
                       placeholder="e.g. Computer Science"
                       value={CLInfo.major}
                       onChange={e => setCLInfo({ ...CLInfo, major: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium">{t('dob')}</label>
+                    <input
+                      type="date"
+                      className="form-input mt-2 block w-full rounded-md border-gray-300"
+                      value={CLInfo.dob ?? ''}
+                      onChange={e => setCLInfo({ ...CLInfo, dob: e.target.value })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium">{t('contact-info')}</label>
+                    <input
+                      type="text"
+                      className="form-input mt-2 block w-full rounded-md border-gray-300"
+                      value={CLInfo.contact ?? ''}
+                      onChange={e => setCLInfo({ ...CLInfo, contact: e.target.value })}
                     />
                   </div>
 
@@ -410,6 +450,45 @@ const LetterForm = () => {
                           </label>
                         </div>
                       ))}
+                      {/* extra msg */}
+                      {CLInfo.financialStatement.includes(t('account-balance')) && (
+                        <div className="mt-2">
+                          <label className="block text-sm font-medium">{t('acc-balance')}</label>
+                          <input
+                            type="text"
+                            className="form-input mt-1 block w-full rounded-md border-gray-300"
+                            placeholder={t('acc-bal-ph')}
+                            value={CLInfo.accountBalance ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, accountBalance: e.target.value })}
+                          />
+                        </div>
+                      )}
+
+                      {CLInfo.financialStatement.includes(t('proof-of-income')) && (
+                        <div className="mt-2">
+                          <label className="block text-sm font-medium">{t('income')}</label>
+                          <input
+                            type="text"
+                            className="form-input mt-1 block w-full rounded-md border-gray-300"
+                            placeholder={t('income-ph')}
+                            value={CLInfo.incomeProof ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, incomeProof: e.target.value })}
+                          />
+                        </div>
+                      )}
+
+                      {CLInfo.financialStatement.includes(t('scholarship')) && (
+                        <div className="mt-2">
+                          <label className="block text-sm font-medium">{t('scholar-info')}</label>
+                          <input
+                            type="text"
+                            className="form-input mt-1 block w-full rounded-md border-gray-300"
+                            placeholder={t('scholar-ph')}
+                            value={CLInfo.scholarship ?? ''}
+                            onChange={e => setCLInfo({ ...CLInfo, scholarship: e.target.value })}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -472,24 +551,89 @@ const LetterForm = () => {
                     <div className="mt-4 space-y-4 transition-all duration-500">
                       <label className="block text-sm font-medium">{t('rental-experience')}</label>
 
-                      {/* Map through the rental history array */}
-                      {CLInfo.previousExperiences.map((experience, index) => (
-                        <div key={index} className="relative p-4 border rounded-md">
-                          <textarea
-                            className="form-input block w-full rounded-md border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
-                            rows={3}
-                            placeholder="Describe your previous rental experience. (Address, rental duration, rent, landlord reference letter.)"
-                            value={experience}
-                            onChange={e => handleExperienceChange(index, e.target.value)}
-                          />
-                          <button
-                            className="absolute top-1 right-1 text-red-500"
-                            onClick={() => removeExperience(index)}
-                          >
-                            {t('delete')}
-                          </button>
-                        </div>
-                      ))}
+                      <div className="max-h-96 overflow-y-auto space-y-4">
+                        {CLInfo.previousExperiences.map((experience, index) => (
+                          <div key={index} className="relative p-4 border rounded-md space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium">{t('house-add')}</label>
+                              <input
+                                type="text"
+                                className="form-input mt-1 block w-full rounded-md border-gray-300"
+                                placeholder={t('house-add-ph')}
+                                value={experience.address}
+                                onChange={e =>
+                                  handleExperienceFieldChange(index, 'address', e.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium">{t('rental-dur')}</label>
+                              <input
+                                type="text"
+                                className="form-input mt-1 block w-full rounded-md border-gray-300"
+                                placeholder={t('rental-ph')}
+                                value={experience.duration}
+                                onChange={e =>
+                                  handleExperienceFieldChange(index, 'duration', e.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium">{t('rent')}</label>
+                              <input
+                                type="text"
+                                className="form-input mt-1 block w-full rounded-md border-gray-300"
+                                placeholder={t('rent')}
+                                value={experience.weeklyRent}
+                                onChange={e =>
+                                  handleExperienceFieldChange(index, 'weeklyRent', e.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`ref-${index}`}
+                                checked={experience.hasReference}
+                                onChange={e =>
+                                  handleExperienceFieldChange(
+                                    index,
+                                    'hasReference',
+                                    e.target.checked
+                                  )
+                                }
+                                className="mr-2"
+                              />
+                              <label htmlFor={`ref-${index}`} className="text-sm">
+                                {t('landlords-ref')}
+                              </label>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium">{t('extra-msg')}</label>
+                              <textarea
+                                rows={3}
+                                className="form-input mt-1 block w-full rounded-md border-gray-300"
+                                placeholder={t('extra-ph')}
+                                value={experience.notes}
+                                onChange={e =>
+                                  handleExperienceFieldChange(index, 'notes', e.target.value)
+                                }
+                              />
+                            </div>
+
+                            <button
+                              className="absolute top-1 right-1 text-red-500"
+                              onClick={() => removeExperience(index)}
+                            >
+                              {t('delete')}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
 
                       {/* Add More Experience Button */}
                       <button
@@ -565,20 +709,82 @@ const LetterForm = () => {
             </div>
           </div>
 
-          {/* List of Document */}
-          {/* <div className="pb-1">
-            <div>
-              {" "}
-              <h2 className="text-xl font-semibold">
-                <button
-                  className="w-full text-left py-3 px-4 bg-gray-100 rounded-md"
-                  onClick={() => toggleAccordion(6)}
-                >
-                  6. List of Document
-                </button>
-              </h2>
+          {/* Required Documents */}
+          <div className="pb-1">
+            <h2 className="text-xl font-semibold">
+              <button
+                className="w-full text-left py-3 px-4 bg-gray-100 rounded-md flex items-center justify-between"
+                onClick={() => toggleAccordion(11)}
+              >
+                <span>{t('docs')}</span>
+                <ChevronDown
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    openAccordion === 11 ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
+              </button>
+            </h2>
+
+            <div
+              className={`transition-all duration-500 ease-in-out max-h-0 overflow-hidden ${
+                openAccordion === 11 ? 'max-h-screen opacity-100' : 'opacity-0'
+              }`}
+            >
+              {openAccordion === 11 && (
+                <div className="space-y-6 px-6 py-4">
+                  {/* Essential Documents */}
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">{t('ess-docs')}</div>
+                    <div className="space-y-2">
+                      {[t('passport'), t('visa'), t('financial-statement')].map(doc => (
+                        <label key={doc} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            value={doc}
+                            checked={requiredDocs.includes(doc)}
+                            onChange={() => {
+                              if (requiredDocs.includes(doc)) {
+                                setRequiredDocs(requiredDocs.filter(d => d !== doc));
+                              } else {
+                                setRequiredDocs([...requiredDocs, doc]);
+                              }
+                            }}
+                            className="mr-2"
+                          />
+                          {doc}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Optional Documents */}
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">{t('opt-docs')}</div>
+                    <div className="space-y-2">
+                      {[t('proof-enr'), t('ref-letter'), t('emp-proof'), t('oth-docs')].map(doc => (
+                        <label key={doc} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            value={doc}
+                            checked={optionalDocs.includes(doc)}
+                            onChange={() => {
+                              if (optionalDocs.includes(doc)) {
+                                setOptionalDocs(optionalDocs.filter(d => d !== doc));
+                              } else {
+                                setOptionalDocs([...optionalDocs, doc]);
+                              }
+                            }}
+                            className="mr-2"
+                          />
+                          {doc}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div> */}
+          </div>
         </div>
       ) : (
         <div className="space-y-6">

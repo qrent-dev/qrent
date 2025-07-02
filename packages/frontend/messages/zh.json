@@ -7,7 +7,18 @@
     "prepare-documents": "申请材料",
     "efficiency-filter": "高效筛房"
   },
-  "DropDownList": { "login": "登录", "signup": "注册" },
+  "DropDownList": {
+    "login": "登录",
+    "signup": "注册",
+    "rental-guide": "租房攻略",
+    "prepare-documents": "申请材料",
+    "efficiency-filter": "高效筛房",
+    "profile": "个人主页"
+  },
+  "Profile": {
+    "profile": "个人主页",
+    "save": "我的收藏"
+  },
   "Footer": { "about": "关于我们", "meet-our-team": "我们的团队", "get-in-touch": "联系我们" },
   "Search": {
     "university": "大学",
@@ -26,7 +37,8 @@
     "save": "保存",
     "price": "价格",
     "area": "地区",
-    "new-today": "今日上新"
+    "new-today": "今日上新",
+    "my-fav": "我的收藏"
   },
   "HeroButton": {
     "rental-guide": "租房指南",
@@ -189,7 +201,30 @@
     "relatives": "亲戚",
     "other-information": "其他信息",
     "other-info-ph": "e.g. 喜欢做饭，上夜班",
-    "feature-in-progress": "此功能仍在开发中，暂不可用。"
+    "feature-in-progress": "此功能仍在开发中，暂不可用。",
+    "dob": "出生日期",
+    "contact-info": "联系方式",
+    "acc-balance": "账户余额金额",
+    "acc-bal-ph": "请输入账户余额（例如：$5,000）",
+    "income": "收入来源及金额",
+    "income-ph": "例如：兼职每周 $300",
+    "scholar-info": "奖学金名称及金额",
+    "scholar-ph": "例如：UNSW 奖学金 $10,000",
+    "house-add": "房屋地址",
+    "house-add-ph": "请输入房屋地址",
+    "rental-dur": "租住时长",
+    "rental-ph": "例：12个月",
+    "rent": "周租金 ($/周)",
+    "landlords-ref": "房东推荐信 (有推荐信)",
+    "extra-msg": "补充说明",
+    "extra-ph": "例：按时交租、保持整洁、与房东关系良好等...",
+    "docs": "6. 文件清单",
+    "ess-docs": "必要文件（请确认已准备",
+    "opt-docs": "其他支持文件（可选）",
+    "proof-enr": "在读证明",
+    "ref-letter": "推荐信",
+    "emp-proof": "工作证明",
+    "oth-docs": "其他支持文件"
   },
   "LanguageSwitcher": {
     "english": "英文",

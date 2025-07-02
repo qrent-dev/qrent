@@ -192,6 +192,15 @@ class PropertyService {
       filter.OR = regionFilter;
     }
 
+    // Target school filter
+    filter.propertySchools = {
+      some: {
+        school: {
+          name: preferences.targetSchool,
+        },
+      },
+    };
+
     // Published date filter
     if (preferences.publishedAt) {
       filter.publishedAt = { gte: new Date(preferences.publishedAt) };

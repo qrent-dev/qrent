@@ -10,6 +10,7 @@ export const filterReportStore = create()(
         totalListings: 0,
         avgRent: 0,
         avgTravelTime: 0,
+        topregions: [],
       },
       updateReport: newReport => {
         set({ report: { ...get().report, ...newReport } });

@@ -131,6 +131,8 @@ model Property {
 model Region {
   id         Int        @id @default(autoincrement()) @db.UnsignedInt
   name       String     @unique @db.VarChar(255)
+  state      String     @db.VarChar(20)
+  postcode   Int        @db.UnsignedInt
   properties Property[]
   schools    School[]
 

@@ -9,14 +9,12 @@ import { Alert } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '../../../store/userInfoStore';
 
-async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-}
-
 const Login = () => {
   const t = useTranslations('Login');
+  const { setUser } = useUserStore();
 
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
@@ -30,14 +28,9 @@ const Login = () => {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const { setUser } = useUserStore();
-
     e.preventDefault();
-    try {
-      console.log(email, password);
-      const baseurl = await getApiBaseUrl();
-      console.log(baseurl);
 
+    try {
       const res = await fetch('/auth/login', {
         method: 'POST',
         headers: {
@@ -52,10 +45,8 @@ const Login = () => {
 
       console.log('Login successful');
       setUser({
-        name: email.split('@')[0],
-
+        name: name,
         email: email,
-
       });
 
       setisSuccVisible(true);
@@ -77,7 +68,13 @@ const Login = () => {
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="name">{t('user-name')}</Label>
-          <Input id="name" placeholder="name" type="name" />
+          <Input
+            id="name"
+            placeholder="name"
+            type="name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
         </LabelInputContainer>
 
         <LabelInputContainer className="mb-4">
