@@ -1,3 +1,4 @@
+DROP USER IF EXISTS 'property_user'@'%';
 CREATE USER 'property_user'@'%' IDENTIFIED BY '${MYSQL_PROPERTY_USER_PASSWORD}';
 
 -- Grant access to property table
