@@ -5,7 +5,8 @@
   "scripts": {
     "test": "jest",
     "dev": "ts-node-dev -r tsconfig-paths/register -T src/server.ts",
-    "start": "ts-node -r tsconfig-paths/register -T src/server.ts"
+    "start": "ts-node -r tsconfig-paths/register -T src/server.ts",
+    "ts-run": "ts-node -r tsconfig-paths/register -T "
   },
   "dependencies": {
     "@qrent/shared": "workspace:*",

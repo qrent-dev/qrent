@@ -1,37 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import { propertyService } from '@/services/PropertyService';
-import { prisma, UserPreference } from '@qrent/shared';
+import { Preference } from '@qrent/shared';
 
 export class PropertyController {
-  async handleProperty(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { propertyId } = req.body;
+  async handleSubscribeProperty(req: Request, res: Response, next: NextFunction) {
+    const propertyId = parseInt(req.params.propertyId);
+    const userId = req.user!.userId;
+    const result = await propertyService.subscribeToProperty(userId, propertyId);
 
-      const userId = req.user?.userId;
+    res.json(result);
+  }
 
-      if (!userId) {
-        return res.status(401).json({ message: 'Invalid token' });
-      }
+  async handleUnsubscribeProperty(req: Request, res: Response, next: NextFunction) {
+    const propertyId = parseInt(req.params.propertyId);
+    const userId = req.user!.userId;
+    const result = await propertyService.unsubscribeFromProperty(userId, propertyId);
 
-      const result = await propertyService.subscribeToProperty(userId, propertyId);
+    res.json(result);
+  }
 
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
+  async fetchSubscriptions(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user!.userId;
+    const result = await propertyService.fetchSubscriptions(userId);
+
+    res.json(result);
   }
 
   async fetchProperty(req: Request, res: Response) {
-    const preferences: UserPreference & { page: number; pageSize: number } = req.body;
-
-    const properties = await propertyService.getPropertiesByPreferences(preferences);
+    const preferences: Preference & { page: number; pageSize: number } = req.body;
+    const properties = await propertyService.getPropertiesByPreferences(preferences, req.user?.userId);
     res.json(properties);
-  }
-
-  async getRegionSummary(req: Request, res: Response) {
-    const regions = req.query.regions as string;
-    const summaries = await propertyService.getRegionSummary(regions);
-    res.json(summaries);
   }
 }
 
