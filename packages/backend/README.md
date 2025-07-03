@@ -30,8 +30,8 @@ This guide will help you set up the backend services using Docker Compose.
    DATABASE_URL="mysql://root:1234@db:3306/qrent"
 
    # Server configuration
-   HOST="0.0.0.0"
-   PORT="3200"
+   BACKEND_LISTEN_HOST="0.0.0.0"
+   BACKEND_LISTEN_PORT="3200"
 
    # Security
    JWT_SECRET="your-secure-jwt-secret"

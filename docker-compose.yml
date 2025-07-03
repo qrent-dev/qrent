@@ -2,14 +2,16 @@ services:
   db:
     image: mysql:8.0
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_PROPERTY_USER_PASSWORD=${MYSQL_PROPERTY_USER_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_PROPERTY_USER_PASSWORD=${DB_PROPERTY_USER_PASSWORD}
     ports:
-      - '3306:3306'
+      - '${DB_PORT}:${DB_PORT}'
     volumes:
-      - qrent-data:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     networks:
       - qrent-network
@@ -27,21 +29,12 @@ services:
       dockerfile: packages/backend/Dockerfile
     env_file:
       - .env
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - API_KEY=${API_KEY}
     ports:
-      - '${EXPOSE_PORT:-3200}:${PORT:-3200}'
+      - '${BACKEND_LISTEN_PORT:-3200}:${BACKEND_LISTEN_PORT:-3200}'
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
-    volumes:
-      - /app/packages/backend/node_modules
-      - /app/packages/shared/node_modules
-      - ./packages/backend:/app/packages/backend
-      - ./packages/shared:/app/packages/shared
     networks:
       - qrent-network
 
@@ -49,4 +42,4 @@ networks:
   qrent-network:
 
 volumes:
-  qrent-data:
+  db_data:

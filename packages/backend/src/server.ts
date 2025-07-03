@@ -77,10 +77,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 /////////////////////////////////////////////////////////////////////
 
 // Start server
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || 'localhost';
-const server = app.listen(PORT, HOST, async () => {
-  console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
+const BACKEND_LISTEN_PORT = Number(process.env.BACKEND_LISTEN_PORT) || 3000;
+const BACKEND_LISTEN_HOST = process.env.BACKEND_LISTEN_HOST || 'localhost';
+const server = app.listen(BACKEND_LISTEN_PORT, BACKEND_LISTEN_HOST, async () => {
+  console.log(`⚡️ Server started on port ${BACKEND_LISTEN_PORT} at ${BACKEND_LISTEN_HOST}`);
 
   const userCount = await prisma.user.count().catch((err) => {
     console.log(err);
