@@ -64,7 +64,6 @@ function buildUserPrompt(data: any): string {
 }
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-console.log("🔑 DeepSeek API Key loaded:", DEEPSEEK_API_KEY);
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 
 const SYSTEM_PROMPT = `
