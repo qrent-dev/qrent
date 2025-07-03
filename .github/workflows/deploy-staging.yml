@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Staging Environment
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: staging
-    needs: []  # 如果要等待 CI 完成，可以添加依赖
+    # needs: []  # 如果要等待 CI 完成，可以添加依赖
 
     steps:
     - uses: actions/checkout@v4
@@ -22,9 +22,9 @@ jobs:
     - name: Copy files to server
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
+        host: ${{ secrets.DEPLOY_SERVER_HOST }}
+        username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+        password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
         source: ".,!node_modules"
         target: "~/qrent/"
 
@@ -37,14 +37,18 @@ jobs:
         script: |
           cd ~/qrent/
 
-          export JWT_SECRET='${{ secrets.BACKEND_JWT_SECRET_KEY }}'
-          export API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
-          export NSW_TRANSPORT_API_KEY='${{ secrets.NSW_TRANSPORT_API_KEY }}'
-          export PROPERTY_RATING_API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
-          export MYSQL_ROOT_PASSWORD='${{ secrets.DB_ROOT_PASSWORD }}'
-          export EXPOSE_PORT='3201'
-          export DATABASE_URL='mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/qrent'
-          export MYSQL_PROPERTY_USER_PASSWORD='${{ secrets.DB_ROOT_PASSWORD }}'
+          cat > .env << EOL
+          BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
+          BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
+          BACKEND_LISTEN_PORT=${{ secrets.BACKEND_LISTEN_PORT }}
+          DB_DATABASE_NAME=${{ secrets.DB_DATABASE_NAME }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_PROPERTY_USER_PASSWORD=${{ secrets.DB_PROPERTY_USER_PASSWORD }}
+          DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+          DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+          PRISMA_DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
+          NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
+          EOL
 
           docker compose down
           docker compose build
@@ -52,7 +56,7 @@ jobs:
           timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
           
           # Check if the server is responding with status code 200
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3200/echo)
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo)
           if [ "$response" != "200" ]; then
             echo "Server health check failed! Got status code: $response"
             exit 1
