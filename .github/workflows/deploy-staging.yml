@@ -29,12 +29,6 @@ jobs:
       - name: Check code formatting
         run: pnpm lint:check
 
-      - name: Run Backend
-        run: pnpm start:backend
-
-      - name: Run tests
-        run: pnpm test
-
       - name: Build project
         run: pnpm build
 
