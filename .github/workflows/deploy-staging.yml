@@ -23,6 +23,7 @@ jobs:
       run: |
         echo "Server: ${{ secrets.DEPLOY_SERVER_HOST }}"
         echo "Server: ${{ secrets.DEPLOY_SERVER_USERNAME }}"
+        echo "Server: ${{ secrets.DEPLOY_SERVER_PASSWORD }}"
 
     - name: Copy files to server
       uses: appleboy/scp-action@v0.1.7
