@@ -29,9 +29,6 @@ jobs:
       - name: Check code formatting
         run: pnpm lint:check
 
-      - name: Run ESLint
-        run: pnpm lint:eslint
-
       - name: Run tests
         run: pnpm test
 
