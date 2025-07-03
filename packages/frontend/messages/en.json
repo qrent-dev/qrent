@@ -13,7 +13,8 @@
     "rental-guide": "Rental-Guide",
     "prepare-documents": "Prepare-documents",
     "efficiency-filter": "Efficiency-Filter",
-    "profile": "My profile"
+    "profile": "My profile",
+    "logout": "Logout"
   },
   "Profile": {
     "profile": "My profile",
