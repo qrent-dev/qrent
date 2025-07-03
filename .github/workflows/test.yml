@@ -37,15 +37,20 @@ jobs:
         docker compose up -d
         timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
-    - name: Verify API health
+    - name: Wait for server to be ready
       run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo)
-        if [ "$response" != "200" ]; then
-          echo "Server health check failed! Got status code: $response"
-          exit 1
-        else
-          echo "Server is up and running with status code 200"
-        fi
+        for i in {1..10}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo || true)
+          if [ "$response" == "200" ]; then
+            echo "✅ Server is up and running."
+            exit 0
+          fi
+          echo "⏳ Waiting for server... Status: $response"
+          sleep 3
+        done
+        echo "❌ Server health check failed after retries."
+        exit 1
+
 
     - name: Cleanup
       if: always()
