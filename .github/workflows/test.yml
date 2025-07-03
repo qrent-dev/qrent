@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
-    branches: [ staging ]
+    branches: [ "*" ]
   pull_request:
-    branches: [ staging ]
+    branches: [ "*" ]
 
 jobs:
   test:
@@ -51,6 +51,9 @@ jobs:
         echo "❌ Server health check failed after retries."
         exit 1
 
+    - name: Run tests in container
+      run: |
+        docker compose exec -T backend pnpm test:backend
 
     - name: Cleanup
       if: always()
