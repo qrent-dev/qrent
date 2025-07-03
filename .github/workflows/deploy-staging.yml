@@ -30,7 +30,7 @@ jobs:
       with:
         host: ${{ secrets.DEPLOY_SERVER_HOST }}
         username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
-        password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+        password: "${{ secrets.DEPLOY_SERVER_PASSWORD }}"
         source: ".,!node_modules"
         target: "~/qrent/"
 
