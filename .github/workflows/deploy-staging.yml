@@ -29,9 +29,6 @@ jobs:
       - name: Check code formatting
         run: pnpm lint:check
 
-      - name: Build project
-        run: pnpm build
-
   deploy:
     runs-on: ubuntu-latest
     environment: staging
