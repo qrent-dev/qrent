@@ -33,9 +33,8 @@ jobs:
         NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
         EOL
         
-        docker compose build
         docker compose up -d
-        timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
+        timeout 60 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
     - name: Wait for server to be ready
       run: |
