@@ -15,17 +15,17 @@ const HouseCard = ({ house }) => {
   }
 
   const t = useTranslations('HouseCard');
-  const price = house.pricePerWeek;
+  const price = house.price;
   const scoreValue = house.averageScore.toFixed(1);
-  if (house.addressLine1 == null) {
-    house.addressLine1 = 'Unknown';
+  if (house.address == null) {
+    house.address = 'Unknown';
   }
 
   if (house.addressLine2 == null) {
     house.addressLine2 = 'Unknown';
   }
 
-  house.addressLine1 = house.addressLine1
+  house.address = house.address
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -72,7 +72,7 @@ const HouseCard = ({ house }) => {
   if (locale == 'en') {
     description = house.keywords.split(',').splice(0, 5);
   } else {
-    description = house.descriptionCN.split(',').splice(0, 7);
+    description = house.descriptionCn.split(',').splice(0, 7);
   }
 
   let propertyType = '';
@@ -97,7 +97,7 @@ const HouseCard = ({ house }) => {
     >
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-800">
-          {house.addressLine1 || 'Unknown Address'}
+          {house.address || 'Unknown Address'}
         </h3>
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />

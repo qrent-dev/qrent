@@ -199,10 +199,6 @@ const HousingFilter = () => {
     updateFilter({ myFav: e.target.checked });
   };
 
-  const handleMyFavCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateFilter({ myFav: e.target.checked });
-  };
-
   const handleCheckboxChange = (option: string) => {
     // Define area mappings - when key is selected, also include the value(s)
     const areaMappings: Record<string, string[]> = {

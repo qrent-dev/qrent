@@ -31,20 +31,20 @@ const HouseCard = ({ house }) => {
     setIsFavorited(!isFavorited);
   };
 
-  const price = house.pricePerWeek;
+  const price = house.price;
   const scoreValue = house.averageScore.toFixed(1);
+  if (house.address == null) {
+    house.address = '';
+  }
   if (house.addressLine1 == null) {
     house.addressLine1 = '';
   }
-  if (house.addressLine2 == null) {
-    house.addressLine2 = '';
-  }
-  house.addressLine1 = house.addressLine1
+  house.address = house.address
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-  house.addressLine2 = house.addressLine2
+  house.addressLine1 = house.addressLine1
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -82,8 +82,8 @@ const HouseCard = ({ house }) => {
     house.keywords = '';
   }
 
-  if (house.descriptionCN == null) {
-    house.descriptionCN = '';
+  if (house.descriptionCn == null) {
+    house.descriptionCn = '';
   }
 
   let description = '';
@@ -94,7 +94,7 @@ const HouseCard = ({ house }) => {
       description = house.keywords.split(',');
     }
   } else {
-    description = house.descriptionCN.split(',');
+    description = house.descriptionCn.split(',');
   }
 
   let propertyType = '';
@@ -118,7 +118,7 @@ const HouseCard = ({ house }) => {
       <div className="mb-4">
         <div className="flex space-x-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            {house.addressLine1 || 'Unknown Address'}
+            {house.address || 'Unknown Address'}
           </h3>
           {propertyType != '' && (
             <div className="flex items-center space-x-2">
@@ -138,7 +138,7 @@ const HouseCard = ({ house }) => {
 
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.addressLine1 || 'Unknown Location'}</span>
         </div>
       </div>
 
@@ -149,17 +149,9 @@ const HouseCard = ({ house }) => {
         </span>
       </div>
 
-      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
         {scoreText}
       </span>
-
-      <button onClick={toggleFavorite} className="absolute top-5 right-4 z-10">
-        <FaHeart
-          className={`text-xl transition-colors duration-200 ${
-            isFavorited ? 'text-pink-500' : 'text-gray-300'
-          }`}
-        />
-      </button>
 
       <div className="flex space-x-4 mt-4">
         {house.bedroomCount != 0 && (
