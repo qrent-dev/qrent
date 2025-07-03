@@ -1,54 +1,62 @@
-import { Prisma, prisma, User, UserPreference, Property } from '@qrent/shared';
+import { Prisma, prisma, User, Preference, Property } from '@qrent/shared';
 import HttpError from '@/error/HttpError';
+import validationService from './ValidationService';
+import _ from 'lodash';
 
 class PropertyService {
-  /**
-   * Subscribe a user to updates for a specific property
-   * @param userId - ID of the user
-   * @param propertyId - ID of the property to subscribe to
-   * @returns Promise resolving to the subscription response
-   */
-  async subscribeToProperty(userId: number, propertyId: number): Promise<string> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: { properties: true },
-      });
-
-      if (!user) {
-        throw new HttpError(400, 'User not found???');
-      }
-      const property = await prisma.property.findUnique({
-        where: { id: propertyId },
-      });
-
-      if (!property) {
-        throw new HttpError(404, 'Property not found');
-      }
-
-      const isSubscribed = user.properties.some(property => property.id === propertyId);
-      if (isSubscribed) {
-        throw new HttpError(409, 'Already subscribed to this property');
-      }
-
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          properties: {
-            connect: { id: propertyId },
+  async fetchSubscriptions(userId: number): Promise<any[]> {
+    await validationService.validateUserExists(userId);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        properties: {
+          include: {
+            region: true,
           },
         },
-      });
+      },
+    });
 
-      return `Successfully subscribed to property`;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new HttpError(400, 'Subscription already exists');
-        }
-      }
-      throw error;
-    }
+    return (
+      user?.properties.map(p => ({
+        ...p,
+        regionId: undefined,
+        region: p.region?.name,
+      })) || []
+    );
+  }
+
+  async subscribeToProperty(userId: number, propertyId: number): Promise<string> {
+    await validationService.validateUserExists(userId);
+    await validationService.validatePropertyExists(propertyId);
+    await validationService.validateUserNotSubscribed(userId, propertyId);
+
+    // Connect user to property (subscribe)
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        properties: {
+          connect: { id: propertyId },
+        },
+      },
+    });
+
+    return `Successfully subscribed to property`;
+  }
+
+  async unsubscribeFromProperty(userId: number, propertyId: number): Promise<string> {
+    await validationService.validateUserExists(userId);
+    await validationService.validatePropertyExists(propertyId);
+    await validationService.validateUserSubscribed(userId, propertyId);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        properties: { disconnect: { id: propertyId } },
+      },
+    });
+
+    return `Successfully unsubscribed from property`;
   }
 
   /**
@@ -57,19 +65,22 @@ class PropertyService {
    * @returns Promise resolving to the filtered properties
    */
   async getPropertiesByPreferences(
-    preferences: UserPreference & {
+    preferences: Preference & {
       page: number;
       pageSize: number;
       publishedAt?: string;
       orderBy?: Prisma.PropertyOrderByWithRelationInput[];
-    }
-  ): Promise<{
-    properties: Property[];
-    propertyCount: number;
-    totalProperties: number;
-    averageWeeklyPrice: number | null;
-    averageCommuteTime: number | null;
-  }> {
+    },
+    userId: number | undefined
+  ): Promise<any> {
+    // Create preference
+    await prisma.preference.create({
+      data: {
+        ..._.omit(preferences, ['page', 'pageSize', 'orderBy', 'publishedAt']),
+        userId,
+      },
+    });
+
     const page = preferences.page;
     const pageSize = preferences.pageSize;
     const skip = (page - 1) * pageSize;
@@ -100,122 +111,161 @@ class PropertyService {
       orderBy = preferences.orderBy;
     }
 
-    const where: Prisma.PropertyWhereInput = {};
+    const filter: Prisma.PropertyWhereInput = {};
 
     // Price filter
-    where.pricePerWeek = {};
+    filter.price = {};
     if (preferences.minPrice) {
-      where.pricePerWeek.gte = preferences.minPrice;
+      filter.price.gte = preferences.minPrice;
     }
     if (preferences.maxPrice) {
-      where.pricePerWeek.lte = preferences.maxPrice;
+      filter.price.lte = preferences.maxPrice;
     }
 
     // Bedroom filter
-    where.bedroomCount = {};
+    filter.bedroomCount = {};
     if (preferences.minBedrooms) {
-      where.bedroomCount.gte = preferences.minBedrooms;
+      filter.bedroomCount.gte = preferences.minBedrooms;
     }
     if (preferences.maxBedrooms) {
-      where.bedroomCount.lte = preferences.maxBedrooms;
+      filter.bedroomCount.lte = preferences.maxBedrooms;
     }
 
     // Bathroom filter
-    where.bathroomCount = {};
+    filter.bathroomCount = {};
     if (preferences.minBathrooms) {
-      where.bathroomCount.gte = preferences.minBathrooms;
+      filter.bathroomCount.gte = preferences.minBathrooms;
     }
     if (preferences.maxBathrooms) {
-      where.bathroomCount.lte = preferences.maxBathrooms;
+      filter.bathroomCount.lte = preferences.maxBathrooms;
     }
 
     // Property type filter
     if (preferences.propertyType) {
-      where.propertyType = preferences.propertyType;
+      filter.propertyType = preferences.propertyType;
     }
 
     // Rating filter
-    where.averageScore = {};
+    filter.averageScore = {};
     if (preferences.minRating) {
-      where.averageScore.gte = preferences.minRating;
+      filter.averageScore.gte = preferences.minRating;
     }
 
     // Commute time filter
-    where.commuteTime = {};
     if (preferences.minCommuteTime) {
-      where.commuteTime.gte = preferences.minCommuteTime;
+      filter.propertySchools = {
+        some: {
+          school: {
+            name: preferences.targetSchool,
+          },
+          commuteTime: {
+            gte: preferences.minCommuteTime,
+          },
+        },
+      };
     }
+
     if (preferences.maxCommuteTime) {
-      where.commuteTime.lte = preferences.maxCommuteTime;
+      filter.propertySchools = {
+        some: {
+          school: {
+            name: preferences.targetSchool,
+          },
+          commuteTime: {
+            lte: preferences.maxCommuteTime,
+          },
+        },
+      };
     }
 
     // Regions filter
+    let regionFilter: Prisma.PropertyWhereInput[] = [];
     if (preferences.regions && preferences.regions.length > 0) {
       const regions = preferences.regions.split(' ');
-      where.OR = regions.map(region => ({
-        addressLine2: {
-          startsWith: region,
+      regionFilter = regions.map(region => ({
+        region: {
+          name: {
+            startsWith: region,
+          },
         },
       }));
+      filter.OR = regionFilter;
     }
+
+    // Target school filter
+    filter.propertySchools = {
+      some: {
+        school: {
+          name: preferences.targetSchool,
+        },
+      },
+    };
 
     // Published date filter
     if (preferences.publishedAt) {
-      where.publishedAt = { gte: new Date(preferences.publishedAt) };
+      filter.publishedAt = { gte: new Date(preferences.publishedAt) };
     }
 
     // Get properties that match the filter
-    const properties = await prisma.property.findMany({
-      where,
+    const propertiesRaw = await prisma.property.findMany({
+      include: {
+        region: true,
+      },
+      where: filter,
       take: pageSize,
       skip,
       orderBy,
     });
 
-    // Total number of properties that match the filter
-    const propertyCount = await prisma.property.count({
-      where,
+    const properties = propertiesRaw.map(p => ({
+      ...p,
+      regionId: undefined,
+      region: p.region?.name,
+    }));
+
+    const aggregate = await prisma.property.aggregate({
+      where: filter,
+      _count: true,
+      _avg: {
+        price: true,
+      },
+    });
+
+    // Get average commute time for the target school
+    const avgCommuteTime = await prisma.propertySchool.aggregate({
+      where: {
+        property: {
+          ...filter,
+        },
+        school: {
+          name: preferences.targetSchool,
+        },
+      },
+      _avg: {
+        commuteTime: true,
+      },
     });
 
     // Total number of properties in the database
-    const totalProperties = await prisma.property.count();
-
-    // Average weekly price of properties that match the filter
-    const averageWeeklyPrice = await prisma.property.aggregate({
-      where,
-      _avg: { pricePerWeek: true },
-    });
-
-    // Average commute time of properties that match the filter
-    const averageCommuteTime = await prisma.property.aggregate({
-      where,
-      _avg: { commuteTime: true },
-    });
-
-    return {
-      properties,
-      propertyCount,
-      totalProperties,
-      averageWeeklyPrice: averageWeeklyPrice._avg.pricePerWeek,
-      averageCommuteTime: averageCommuteTime._avg.commuteTime,
-    };
-  }
-
-  async getRegionSummary(regions: string) {
-    const where: Prisma.PropertyWhereInput = {};
-
-    const regionList = regions.split(' ');
-    where.OR = regionList.map(region => ({
-      addressLine2: {
-        startsWith: region,
+    const totalCount = await prisma.property.count({
+      where: {
+        propertySchools: {
+          some: {
+            school: {
+              name: preferences.targetSchool,
+            },
+          },
+        },
       },
-    }));
+    });
 
-    const summaries = await prisma.property.groupBy({
-      by: ['addressLine2'],
-      where,
+    const topRegionsRaw = await prisma.property.groupBy({
+      by: ['regionId'],
+      where: filter,
       _count: true,
-      _avg: { pricePerWeek: true, commuteTime: true, averageScore: true },
+      _avg: {
+        price: true,
+      },
       orderBy: {
         _count: {
           id: 'desc',
@@ -224,18 +274,63 @@ class PropertyService {
       take: 5,
     });
 
-    const totalProperties = summaries.reduce((acc, summary) => acc + summary._count, 0);
+    const topRegions = await Promise.all(
+      topRegionsRaw.map(async r => {
+        const region = await prisma.region.findUnique({
+          where: {
+            id: r.regionId,
+          },
+        });
+
+        const commuteTime = await prisma.propertySchool.aggregate({
+          where: {
+            property: {
+              ...filter,
+              regionId: r.regionId,
+            },
+            school: {
+              name: preferences.targetSchool,
+            },
+          },
+          _avg: {
+            commuteTime: true,
+          },
+        });
+
+        return {
+          propertyCount: r._count,
+          averagePrice: r._avg.price,
+          averageCommuteTime: commuteTime._avg.commuteTime,
+          region: region?.name,
+        };
+      })
+    );
 
     return {
-      summaries: summaries.map(summary => ({
-        region: summary.addressLine2,
-        propertyCount: summary._count,
-        averageWeeklyPrice: summary._avg.pricePerWeek,
-        averageCommuteTime: summary._avg.commuteTime,
-        averageScore: summary._avg.averageScore,
-      })),
-      totalProperties,
+      properties,
+      totalCount,
+      filteredCount: aggregate._count || 0,
+      averagePrice: aggregate._avg.price,
+      averageCommuteTime: avgCommuteTime._avg.commuteTime,
+      topRegions,
     };
+  }
+
+  async fetchPreference(userId: number): Promise<Preference | null> {
+    const preference = await prisma.preference.findFirst({
+      where: {
+        userId,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    if (!preference) {
+      throw new HttpError(404, 'Preference not found');
+    }
+
+    return preference;
   }
 }
 

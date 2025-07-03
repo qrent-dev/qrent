@@ -31,24 +31,37 @@ def fetch_db_data():
         )
         if connection.is_connected():
             cursor = connection.cursor(dictionary=True)
-            sql = """
-                SELECT 
-                    houseId,
-                    description, 
-                    availableDate, 
-                    commuteTime, 
-                    publishedAt, 
-                    keywords, 
-                    averageScore, 
-                    url, 
-                    descriptionCN
-                FROM property
-            """
+            
+            cursor.execute("DESCRIBE property")
+            columns_info = cursor.fetchall()
+            available_columns = [col['Field'] for col in columns_info]
+            print(f"Available columns in database: {available_columns}")
+            
+            desired_columns = [
+                'houseId', 'description', 'availableDate', 
+                'commuteTime_UNSW', 'commuteTime_USYD',
+                'publishedAt', 'keywords', 'averageScore', 
+                'url', 'descriptionCN'
+            ]
+            
+            existing_columns = [col for col in desired_columns if col in available_columns]
+            missing_columns = [col for col in desired_columns if col not in available_columns]
+            
+            if missing_columns:
+                print(f"Warning: Missing columns in database: {missing_columns}")
+            
+            if not existing_columns:
+                print("No required columns found in database")
+                return pd.DataFrame()
+            
+            columns_str = ', '.join(existing_columns)
+            sql = f"SELECT {columns_str} FROM property"
+            
             cursor.execute(sql)
             db_data = cursor.fetchall()
             cursor.close()
             connection.close()
-            print("Successfully fetched data from database")
+            print(f"Successfully fetched data from database with columns: {existing_columns}")
             return pd.DataFrame(db_data)
         else:
             print("Cannot connect to the database")
@@ -70,33 +83,20 @@ def scrape_property_data(university):
     db_df = fetch_db_data()
     if not db_df.empty:
         db_df_unique = db_df.drop_duplicates(subset=['houseId'], keep='first')
-        for col in ['description', 'availableDate', 'commuteTime', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']:
+        all_required_cols = ['description', 'availableDate', 'commuteTime_UNSW', 'commuteTime_USYD', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']
+
+        for col in all_required_cols:
             if col not in today_data.columns:
                 today_data[col] = None
-        today_data['description'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['description']
-        )
-        today_data['availableDate'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['availableDate']
-        )
-        today_data['commuteTime'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['commuteTime']
-        )
-        today_data['publishedAt'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['publishedAt']
-        )
-        today_data['keywords'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['keywords']
-        )
-        today_data['averageScore'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['averageScore']
-        )
-        today_data['url'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['url']
-        )
-        today_data['descriptionCN'] = today_data['houseId'].map(
-            db_df_unique.set_index('houseId')['descriptionCN']
-        )
+
+        for col in all_required_cols:
+            if col in db_df_unique.columns:
+                print(f"Mapping column: {col}")
+                today_data[col] = today_data['houseId'].map(
+                    db_df_unique.set_index('houseId')[col]
+                )
+            else:
+                print(f"Column {col} not found in database, keeping as None")
     else:
         print("No data retrieved from the database. Skipping DB mapping.")
 

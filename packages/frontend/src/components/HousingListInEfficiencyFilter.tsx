@@ -70,9 +70,11 @@ const HousingListInEfficiencyFilter = () => {
         // if filter area is empty, user didn't choose any region
         // then set region based on school
         if (filter.university == 'UNSW') {
+          requestBody.targetSchool = 'UNSW';
           requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
         } else {
           // else, USYD
+          requestBody.targetSchool = 'USYD';
           requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
         }
       }
@@ -156,10 +158,11 @@ const HousingListInEfficiencyFilter = () => {
 
       setTotalPage(Math.ceil(results.propertyCount / 10));
       updateReport({
-        currentListings: results.propertyCount,
-        totalListings: results.totalProperties,
-        avgRent: results.averageWeeklyPrice,
+        currentListings: results.filteredCount,
+        totalListings: results.totalCount,
+        avgRent: results.averagePrice,
         avgTravelTime: results.averageCommuteTime,
+        topRegions: results.topRegions,
       });
 
       console.log(results);

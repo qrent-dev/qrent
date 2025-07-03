@@ -149,9 +149,17 @@ const HouseCard = ({ house }) => {
         </span>
       </div>
 
-      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
         {scoreText}
       </span>
+
+      <button onClick={toggleFavorite} className="absolute top-5 right-4 z-10">
+        <FaHeart
+          className={`text-xl transition-colors duration-200 ${
+            isFavorited ? 'text-pink-500' : 'text-gray-300'
+          }`}
+        />
+      </button>
 
       <div className="flex space-x-4 mt-4">
         {house.bedroomCount != 0 && (
