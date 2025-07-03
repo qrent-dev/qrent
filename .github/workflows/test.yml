@@ -29,7 +29,7 @@ jobs:
         DB_PROPERTY_USER_PASSWORD=${{ secrets.DB_PROPERTY_USER_PASSWORD }}
         DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
         DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
-        PRISMA_DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
+        DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
         NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
         EOL
         
