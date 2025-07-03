@@ -82,10 +82,10 @@ const BACKEND_LISTEN_HOST = process.env.BACKEND_LISTEN_HOST || 'localhost';
 const server = app.listen(BACKEND_LISTEN_PORT, BACKEND_LISTEN_HOST, async () => {
   console.log(`⚡️ Server started on port ${BACKEND_LISTEN_PORT} at ${BACKEND_LISTEN_HOST}`);
 
-  const userCount = await prisma.user.count().catch((err) => {
+  const userCount = await prisma.user.count().catch(err => {
     console.log(err);
   });
-  const propertyCount = await prisma.property.count().catch((err) => {
+  const propertyCount = await prisma.property.count().catch(err => {
     console.log(err);
   });
   console.log(`You have ${userCount} users in your database`);

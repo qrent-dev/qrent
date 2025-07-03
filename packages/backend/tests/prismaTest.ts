@@ -1,4 +1,4 @@
-import { prisma as p } from '@qrent/shared'; 
+import { prisma as p } from '@qrent/shared';
 
 const FULL_SUBURB_OPTIONS = {
   unsw: [
@@ -142,7 +142,7 @@ async function seed_school_region() {
   // const allProperties = await p.properties.findMany({
   //   select: { id: true }
   // });
-  
+
   // const regions = await p.regions.findMany({
   //   select: { id: true }
   // });
@@ -154,9 +154,9 @@ async function seed_school_region() {
       },
       {
         name: 'USYD',
-      }
-    ]
-  })
+      },
+    ],
+  });
 
   FULL_SUBURB_OPTIONS.unsw.forEach(async suburb => {
     await p.school.update({
@@ -166,11 +166,11 @@ async function seed_school_region() {
       data: {
         regions: {
           connect: {
-            name: suburb
-          }
-        }
-      }
-    })
+            name: suburb,
+          },
+        },
+      },
+    });
   });
 
   FULL_SUBURB_OPTIONS.usyd.forEach(async suburb => {
@@ -181,11 +181,11 @@ async function seed_school_region() {
       data: {
         regions: {
           connect: {
-            name: suburb
-          }
-        }
-      }
-    })
+            name: suburb,
+          },
+        },
+      },
+    });
   });
 }
 
@@ -194,7 +194,7 @@ async function seed_property_school() {
   const properties = await p.property.findMany({
     include: {
       region: true,
-    }
+    },
   });
 
   const schools = await p.school.findMany();
@@ -203,20 +203,20 @@ async function seed_property_school() {
     for (const school of schools) {
       const schoolName = school.name.toLowerCase();
       const regionName = property.region.name.toLowerCase();
-      
+
       // Check if the region is related to the school
-      const isRelated = 
+      const isRelated =
         (schoolName === 'unsw' && FULL_SUBURB_OPTIONS.unsw.includes(regionName)) ||
         (schoolName === 'usyd' && FULL_SUBURB_OPTIONS.usyd.includes(regionName));
-      
+
       if (isRelated) {
         await p.propertySchool.create({
           data: {
             propertyId: property.id,
             schoolId: school.id,
             commuteTime: Math.floor(Math.random() * 180) + 10,
-          }
-        })
+          },
+        });
       }
     }
   });

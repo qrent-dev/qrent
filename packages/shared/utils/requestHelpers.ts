@@ -53,7 +53,9 @@ function hello(): Promise<Record<string, string>> {
   return http.get('/hello');
 }
 
-function register(data: { email: string; password: string } & Partial<Omit<User, 'email' | 'password'>>): Promise<{ token: string }> {
+function register(
+  data: { email: string; password: string } & Partial<Omit<User, 'email' | 'password'>>
+): Promise<{ token: string }> {
   return http.post('/auth/register', data);
 }
 
