@@ -7,10 +7,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Alert } from '@heroui/react';
 
-async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-}
-
 const Signup = () => {
   const t = useTranslations('Signup');
 
@@ -34,8 +30,6 @@ const Signup = () => {
         throw new Error('different password');
       }
       console.log(email, password);
-      const baseurl = await getApiBaseUrl();
-      console.log(baseurl);
 
       const res = await fetch(`/auth/register`, {
         method: 'POST',
