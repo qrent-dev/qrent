@@ -14,6 +14,8 @@ const HousingListInEfficiencyFilter = () => {
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [topRegions, setTopRegions] = useState([]);
+
   const { filter, updateFilter } = useFilterStore();
   const { report, updateReport } = filterReportStore();
 
@@ -149,8 +151,9 @@ const HousingListInEfficiencyFilter = () => {
         },
         body: JSON.stringify(requestBody),
       });
-      let results = await response.json();
-      // results = results.properties;
+      const results = await response.json();
+      setTopRegions(results.topRegions);
+
       let properties = results.properties;
 
       properties.sort((a, b) => b.averageScore - a.averageScore);

@@ -397,23 +397,6 @@ const HousingFilter = () => {
         </div>
       </div>
 
-      {/* My favorites */}
-      <div className="mt-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="newTodayCheckbox" className="text-lg text-gray-600 font-bold">
-            {t('my-fav')}
-          </label>
-
-          <input
-            type="checkbox"
-            id="myFavCheckbox"
-            checked={filter.myFav}
-            onChange={handleMyFavCheckboxChange}
-            className="mt-1"
-          />
-        </div>
-      </div>
-
       {/* Area */}
       <div className="mt-4">
         <div

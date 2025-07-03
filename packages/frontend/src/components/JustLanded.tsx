@@ -27,9 +27,12 @@ const JustLanded = () => {
     try {
       const requestBody = {};
 
-      if (school === 'unsw') {
+      if (filter.university == 'UNSW') {
+        requestBody.targetSchool = 'UNSW';
         requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
       } else {
+        // else, USYD
+        requestBody.targetSchool = 'USYD';
         requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
       }
 
