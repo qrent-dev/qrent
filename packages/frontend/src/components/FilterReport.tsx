@@ -9,6 +9,10 @@ const FilterReport = () => {
   const t = useTranslations('FilterReport');
   const { report } = filterReportStore();
 
+  if (!report.topRegions || report.topRegions.length === 0) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       <div className="w-full bg-white rounded-lg shadow p-6 flex flex-col gap-6">
