@@ -108,6 +108,8 @@ const HouseCard = ({ house }) => {
     propertyType = 'Semi-detached';
   }
 
+  // test vercel merge
+
   return (
     <a
       href={house.url}
