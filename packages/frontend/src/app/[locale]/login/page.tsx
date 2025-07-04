@@ -15,6 +15,7 @@ const Login = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
   const succTitle = t('succ-title');
@@ -42,10 +43,14 @@ const Login = () => {
         throw new Error('Login failed');
       }
 
+      const token = await res.json();
+      setToken(token);
+
       console.log('Login successful');
       setUser({
         name: email.slice(0, 4),
         email: email,
+        token: token,
       });
 
       setisSuccVisible(true);

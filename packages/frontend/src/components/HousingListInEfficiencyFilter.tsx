@@ -168,7 +168,7 @@ const HousingListInEfficiencyFilter = () => {
         topRegions: results.topRegions,
       });
 
-      console.log(results);
+      console.log(listings);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

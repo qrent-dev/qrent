@@ -3,8 +3,12 @@
 
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import React from 'react';
-import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
+import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
+import { subscribeToProperty } from '../app/api/properties/client/subscribe';
+import { useUserStore } from '../store/userInfoStore';
+import { useFilterStore } from '../store/useFilterStore';
 
 const HouseCard = ({ house }) => {
   let locale = '';
@@ -88,6 +92,26 @@ const HouseCard = ({ house }) => {
     propertyType = 'Unknown';
   }
 
+  const token = useUserStore(state => state.userInfo.token).token;
+
+  const [isFavorited, setIsFavorited] = useState(false);
+  const toggleFavorite = async e => {
+    e.preventDefault();
+    if (!token) return alert('Login required');
+
+    try {
+      if (isFavorited) {
+        await unsubscribeFromProperty(house.id, token);
+      } else {
+        await subscribeToProperty(house.id, token);
+      }
+      setIsFavorited(!isFavorited);
+    } catch (err) {
+      console.error(err);
+      alert('Error subscribing');
+    }
+  };
+
   return (
     <a
       href={house.url}
@@ -106,11 +130,18 @@ const HouseCard = ({ house }) => {
       </div>
 
       <div className="flex items-center space-x-2">
-        <span className="text-2xl font-semibold text-blue-primary">
+        <span className="text-xl font-semibold text-blue-primary">
           {`$${price}`}{' '}
           <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
         </span>
         <span className={`text-xs ${scoreClass} rounded-full px-2 py-1`}>{scoreText}</span>
+        <button onClick={toggleFavorite} className="focus:outline-none">
+          <FaHeart
+            className={`text-2xl transition-colors duration-200 ${
+              isFavorited ? 'text-pink-500' : 'text-gray-300'
+            }`}
+          />
+        </button>
       </div>
 
       <div className="flex space-x-4 mt-4">
