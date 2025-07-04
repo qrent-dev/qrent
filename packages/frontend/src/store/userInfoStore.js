@@ -7,6 +7,7 @@ export const useUserStore = create()(
       userInfo: {
         name: '',
         email: '',
+        token: '',
       },
       setUser: userInfo => set({ userInfo: { ...get().userInfo, ...userInfo } }),
     }),
