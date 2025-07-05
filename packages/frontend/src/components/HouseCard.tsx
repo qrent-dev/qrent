@@ -54,15 +54,10 @@ const HouseCard = ({ house }) => {
   if (house.address == null) {
     house.address = '';
   }
-  if (house.addressLine1 == null) {
-    house.addressLine1 = '';
+  if (house.region == null) {
+    house.region = '';
   }
   house.address = house.address
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  house.addressLine1 = house.addressLine1
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -156,7 +151,7 @@ const HouseCard = ({ house }) => {
 
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine1 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.region || 'Unknown Location'}</span>
         </div>
       </div>
 

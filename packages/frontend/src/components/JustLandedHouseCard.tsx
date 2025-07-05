@@ -125,7 +125,7 @@ const HouseCard = ({ house }) => {
         </h3>
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.region || 'Unknown Location'}</span>
         </div>
       </div>
 
