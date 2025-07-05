@@ -14,6 +14,10 @@ import {
   FaHeart,
 } from 'react-icons/fa';
 
+import { subscribeToProperty } from '../app/api/properties/client/subscribe';
+import { useUserStore } from '../store/userInfoStore';
+import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
+
 const HouseCard = ({ house }) => {
   let locale = '';
   if (usePathname().startsWith('/en')) {
@@ -25,10 +29,24 @@ const HouseCard = ({ house }) => {
   const t = useTranslations('HouseCard');
 
   const [isFavorited, setIsFavorited] = useState(false);
+  const { userInfo } = useUserStore();
+  const token = useUserStore(state => state.userInfo.token).token;
 
-  const toggleFavorite = e => {
+  const toggleFavorite = async e => {
     e.preventDefault();
-    setIsFavorited(!isFavorited);
+    if (!token) return alert('Login required');
+
+    try {
+      if (isFavorited) {
+        await unsubscribeFromProperty(house.id, token);
+      } else {
+        await subscribeToProperty(house.id, token);
+      }
+      setIsFavorited(!isFavorited);
+    } catch (err) {
+      console.error(err);
+      alert('Error subscribing');
+    }
   };
 
   const price = house.price;
@@ -108,8 +126,6 @@ const HouseCard = ({ house }) => {
     propertyType = 'Semi-detached';
   }
 
-  // test vercel merge
-
   return (
     <a
       href={house.url}
@@ -170,12 +186,12 @@ const HouseCard = ({ house }) => {
           </div>
         )}
 
-        {house.commuteTime != 0 && (
+        {/* {house.commuteTime != 0 && (
           <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
             <FaRegClock className="text-blue-primary" />
             <span className="text-sm">{house.commuteTime}</span>
           </div>
-        )}
+        )} */}
 
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
           <FaCalendarAlt className="text-blue-primary" />

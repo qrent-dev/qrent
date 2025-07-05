@@ -159,7 +159,7 @@ const HousingListInEfficiencyFilter = () => {
       properties.sort((a, b) => b.averageScore - a.averageScore);
       setListings(properties);
 
-      setTotalPage(Math.ceil(results.propertyCount / 10));
+      setTotalPage(Math.ceil(results.filteredCount / 10));
       updateReport({
         currentListings: results.filteredCount,
         totalListings: results.totalCount,
@@ -168,7 +168,7 @@ const HousingListInEfficiencyFilter = () => {
         topRegions: results.topRegions,
       });
 
-      console.log(results);
+      console.log(listings);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

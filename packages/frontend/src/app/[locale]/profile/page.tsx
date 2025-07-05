@@ -10,7 +10,7 @@ export default function ProfilePage() {
   const { userInfo } = useUserStore();
   const t = useTranslations('Profile');
   const router = useRouter();
-  const { filter, updateFilter } = useFilterStore();
+  const { updateFilter } = useFilterStore();
 
   const user = {
     name: userInfo.name,
@@ -20,7 +20,7 @@ export default function ProfilePage() {
 
   const handleSaveClick = () => {
     updateFilter({ myFav: true });
-    router.push('/findAHome');
+    router.push('/myFav');
   };
 
   return (
