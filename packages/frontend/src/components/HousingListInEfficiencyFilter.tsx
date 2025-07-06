@@ -66,19 +66,15 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.maxBathrooms = parseInt(filter.bathroomMax);
       }
 
+      if (filter.university == 'UNSW') {
+        requestBody.targetSchool = 'University of New South Wales';
+      } else {
+        // else, USYD
+        requestBody.targetSchool = 'University of Sydney';
+      }
+
       if (filter.area && filter.area.length > 0 && !filter.area.includes('Any')) {
         requestBody.regions = filter.area.join(' ');
-      } else {
-        // if filter area is empty, user didn't choose any region
-        // then set region based on school
-        if (filter.university == 'UNSW') {
-          requestBody.targetSchool = 'University of New South Wales';
-          requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
-        } else {
-          // else, USYD
-          requestBody.targetSchool = 'University of Sydney';
-          requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
-        }
       }
 
       if (
