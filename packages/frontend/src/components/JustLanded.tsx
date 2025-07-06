@@ -29,11 +29,9 @@ const JustLanded = () => {
 
       if (filter.university == 'UNSW') {
         requestBody.targetSchool = 'University of New South Wales';
-        requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
       } else {
         // else, USYD
         requestBody.targetSchool = 'University of Sydney';
-        requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
       }
 
       requestBody.page = 1;
