@@ -28,7 +28,10 @@ export class PropertyController {
 
   async fetchProperty(req: Request, res: Response) {
     const preferences: Preference & { page: number; pageSize: number } = req.body;
-    const properties = await propertyService.getPropertiesByPreferences(preferences, req.user?.userId);
+    const properties = await propertyService.getPropertiesByPreferences(
+      preferences,
+      req.user?.userId
+    );
     res.json(properties);
   }
 }

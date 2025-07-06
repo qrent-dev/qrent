@@ -35,11 +35,11 @@ export const authenticate: RequestHandler = async (
       if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer ') &&
-        process.env.JWT_SECRET
+        process.env.BACKEND_JWT_SECRET_KEY
       ) {
         try {
           const token = req.headers.authorization.split(' ')[1];
-          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          const decoded = jwt.verify(token, process.env.BACKEND_JWT_SECRET_KEY);
           req.user = decoded as JwtPayload;
           return next();
         } catch (error) {
@@ -59,7 +59,7 @@ export const authenticate: RequestHandler = async (
     const token = authHeader.split(' ')[1];
 
     // Verify token
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.BACKEND_JWT_SECRET_KEY;
     if (!secret) {
       throw new HttpError(500, 'JWT secret is not configured');
     }
@@ -84,7 +84,7 @@ export const authenticate: RequestHandler = async (
 };
 
 export function generateToken(userId: number): string {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.BACKEND_JWT_SECRET_KEY;
 
   if (!secret) {
     throw new HttpError(500, 'JWT secret is not configured');

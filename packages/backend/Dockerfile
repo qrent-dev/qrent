@@ -4,9 +4,6 @@ FROM node:20-alpine AS base
 # Set working directory
 WORKDIR /app
 
-# Install pnpm globally and necessary tools
-# RUN apk add --no-cache netcat-openbsd
-
 # Install pnpm globally
 RUN npm install -g pnpm
 
@@ -24,12 +21,8 @@ RUN pnpm install --frozen-lockfile
 COPY packages/backend ./packages/backend
 COPY packages/shared ./packages/shared
 
-# # Build Prisma client
-RUN cd packages/shared && pnpm db:generate
-# RUN cd packages/shared && pnpm db:push
-
 # Copy startup script
-COPY startup.sh ./
+COPY packages/backend/startup.sh ./
 RUN chmod +x ./startup.sh
 
 # Use the startup script as the entry point
