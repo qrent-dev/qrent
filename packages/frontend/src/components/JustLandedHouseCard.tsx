@@ -68,8 +68,8 @@ const HouseCard = ({ house }) => {
     house.keywords = '';
   }
 
-  if (house.descriptionCN == null) {
-    house.descriptionCN = '';
+  if (house.descriptionCn == null) {
+    house.descriptionCn = '';
   }
 
   let description = '';
