@@ -13,7 +13,9 @@
     "rental-guide": "Rental-Guide",
     "prepare-documents": "Prepare-documents",
     "efficiency-filter": "Efficiency-Filter",
-    "profile": "My profile"
+    "profile": "My profile",
+    "logout": "Logout",
+    "myFav": "My Favorites"
   },
   "Profile": {
     "profile": "My profile",
@@ -329,5 +331,12 @@
     "avg-time": "Average Travel Time: ",
     "pop-areas": "Top 5 Areas: ",
     "num-of-properties": "Number of Properties: "
+  },
+  "MyFav": {
+    "title": "Your Saved Listings",
+    "subtitle1": "You have saved",
+    "subtitle2": "listings",
+    "no-listings": "You haven’t saved any listings yet.",
+    "explore": "Back to Explore"
   }
 }

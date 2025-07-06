@@ -14,6 +14,10 @@ import {
   FaHeart,
 } from 'react-icons/fa';
 
+import { subscribeToProperty } from '../app/api/properties/client/subscribe';
+import { useUserStore } from '../store/userInfoStore';
+import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
+
 const HouseCard = ({ house }) => {
   let locale = '';
   if (usePathname().startsWith('/en')) {
@@ -25,26 +29,35 @@ const HouseCard = ({ house }) => {
   const t = useTranslations('HouseCard');
 
   const [isFavorited, setIsFavorited] = useState(false);
+  const { userInfo } = useUserStore();
+  const token = useUserStore(state => state.userInfo.token).token;
 
-  const toggleFavorite = e => {
+  const toggleFavorite = async e => {
     e.preventDefault();
-    setIsFavorited(!isFavorited);
+    if (!token) return alert('Login required');
+
+    try {
+      if (isFavorited) {
+        await unsubscribeFromProperty(house.id, token);
+      } else {
+        await subscribeToProperty(house.id, token);
+      }
+      setIsFavorited(!isFavorited);
+    } catch (err) {
+      console.error(err);
+      alert('Error subscribing');
+    }
   };
 
-  const price = house.pricePerWeek;
+  const price = house.price;
   const scoreValue = house.averageScore.toFixed(1);
-  if (house.addressLine1 == null) {
-    house.addressLine1 = '';
+  if (house.address == null) {
+    house.address = '';
   }
-  if (house.addressLine2 == null) {
-    house.addressLine2 = '';
+  if (house.region == null) {
+    house.region = '';
   }
-  house.addressLine1 = house.addressLine1
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  house.addressLine2 = house.addressLine2
+  house.address = house.address
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -82,8 +95,8 @@ const HouseCard = ({ house }) => {
     house.keywords = '';
   }
 
-  if (house.descriptionCN == null) {
-    house.descriptionCN = '';
+  if (house.descriptionCn == null) {
+    house.descriptionCn = '';
   }
 
   let description = '';
@@ -94,7 +107,7 @@ const HouseCard = ({ house }) => {
       description = house.keywords.split(',');
     }
   } else {
-    description = house.descriptionCN.split(',');
+    description = house.descriptionCn.split(',');
   }
 
   let propertyType = '';
@@ -118,7 +131,7 @@ const HouseCard = ({ house }) => {
       <div className="mb-4">
         <div className="flex space-x-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            {house.addressLine1 || 'Unknown Address'}
+            {house.address || 'Unknown Address'}
           </h3>
           {propertyType != '' && (
             <div className="flex items-center space-x-2">
@@ -138,7 +151,7 @@ const HouseCard = ({ house }) => {
 
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.region || 'Unknown Location'}</span>
         </div>
       </div>
 
@@ -149,17 +162,9 @@ const HouseCard = ({ house }) => {
         </span>
       </div>
 
-      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-10`}>
+      <span className={`text-md ${scoreClass} rounded-full px-2 py-1 absolute top-4 right-4`}>
         {scoreText}
       </span>
-
-      <button onClick={toggleFavorite} className="absolute top-5 right-4 z-10">
-        <FaHeart
-          className={`text-xl transition-colors duration-200 ${
-            isFavorited ? 'text-pink-500' : 'text-gray-300'
-          }`}
-        />
-      </button>
 
       <div className="flex space-x-4 mt-4">
         {house.bedroomCount != 0 && (
@@ -176,12 +181,12 @@ const HouseCard = ({ house }) => {
           </div>
         )}
 
-        {house.commuteTime != 0 && (
+        {/* {house.commuteTime != 0 && (
           <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
             <FaRegClock className="text-blue-primary" />
             <span className="text-sm">{house.commuteTime}</span>
           </div>
-        )}
+        )} */}
 
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
           <FaCalendarAlt className="text-blue-primary" />

@@ -3,10 +3,12 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@
 import { User } from 'lucide-react';
 import { useTranslations } from 'use-intl';
 import { useUserStore } from '../store/userInfoStore';
+import { useRouter } from 'next/navigation';
 
 export default function DropDownList() {
   const t = useTranslations('DropDownList');
   const { userInfo } = useUserStore();
+  const router = useRouter();
 
   return (
     <Dropdown>
@@ -38,6 +40,20 @@ export default function DropDownList() {
             </DropdownItem>
             <DropdownItem key="prepareDocuments" href="/prepareDocuments" className="font-sans">
               {t('prepare-documents')}
+            </DropdownItem>
+            <DropdownItem key="prepareDocuments" href="/myFav" className="font-sans">
+              {t('myFav')}
+            </DropdownItem>
+            <DropdownItem
+              key="logout"
+              onClick={() => {
+                localStorage.clear();
+                router.push('/');
+                window.location.reload();
+              }}
+              className="font-sans"
+            >
+              {t('logout')}
             </DropdownItem>
           </>
         ) : (

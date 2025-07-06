@@ -7,6 +7,8 @@ import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
 import { useFilterStore } from '../store/useFilterStore';
 import { ChevronDown } from 'lucide-react';
+import { useUserStore } from '../store/userInfoStore';
+import { getUserSubscriptions } from '../app/api/properties/client/getUserSubscriptions';
 
 export const FULL_SUBURB_OPTIONS = {
   unsw: [
@@ -195,10 +197,6 @@ const HousingFilter = () => {
     updateFilter({ newToday: e.target.checked });
   };
 
-  const handleMyFavCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateFilter({ myFav: e.target.checked });
-  };
-
   const handleCheckboxChange = (option: string) => {
     // Define area mappings - when key is selected, also include the value(s)
     const areaMappings: Record<string, string[]> = {
@@ -383,7 +381,7 @@ const HousingFilter = () => {
         </div>
 
         {/* My favorites */}
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <label htmlFor="myFavCheckbox" className="text-lg text-gray-600 font-bold">
             {t('my-fav')}
           </label>
@@ -394,24 +392,7 @@ const HousingFilter = () => {
             onChange={handleMyFavCheckboxChange}
             className="mt-1"
           />
-        </div>
-      </div>
-
-      {/* My favorites */}
-      <div className="mt-4">
-        <div className="flex items-center gap-2">
-          <label htmlFor="newTodayCheckbox" className="text-lg text-gray-600 font-bold">
-            {t('my-fav')}
-          </label>
-
-          <input
-            type="checkbox"
-            id="myFavCheckbox"
-            checked={filter.myFav}
-            onChange={handleMyFavCheckboxChange}
-            className="mt-1"
-          />
-        </div>
+        </div> */}
       </div>
 
       {/* Area */}

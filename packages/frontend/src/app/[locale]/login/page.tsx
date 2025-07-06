@@ -14,8 +14,8 @@ const Login = () => {
   const { setUser } = useUserStore();
 
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
   const succTitle = t('succ-title');
@@ -43,17 +43,21 @@ const Login = () => {
         throw new Error('Login failed');
       }
 
+      const token = await res.json();
+      setToken(token);
+
       console.log('Login successful');
       setUser({
-        name: name,
+        name: email.slice(0, 4),
         email: email,
+        token: token,
       });
 
       setisSuccVisible(true);
 
       setTimeout(() => {
         router.push('/');
-      }, 2000);
+      }, 1000);
     } catch (err) {
       console.log(err);
       setisFailVisible(true);
@@ -66,17 +70,6 @@ const Login = () => {
       <p className="text-black text-sm max-w-sm mt-2 ">{t('login-to-continue')}</p>
 
       <form className="my-8" onSubmit={handleSubmit}>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="name">{t('user-name')}</Label>
-          <Input
-            id="name"
-            placeholder="name"
-            type="name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-        </LabelInputContainer>
-
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">{t('email-address')}</Label>
           <Input
