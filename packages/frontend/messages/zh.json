@@ -13,7 +13,9 @@
     "rental-guide": "租房攻略",
     "prepare-documents": "申请材料",
     "efficiency-filter": "高效筛房",
-    "profile": "个人主页"
+    "profile": "个人主页",
+    "logout": "登出",
+    "myFav": "你的收藏"
   },
   "Profile": {
     "profile": "个人主页",
@@ -326,5 +328,12 @@
     "avg-time": "平均通勤时间：",
     "pop-areas": "区域排名（前5名）",
     "num-of-properties": "房源数量："
+  },
+  "MyFav": {
+    "title": "你的收藏",
+    "subtitle1": "你收藏了",
+    "subtitle2": "套房源",
+    "no-listings": "你还没收藏任何房源",
+    "explore": "返回浏览"
   }
 }

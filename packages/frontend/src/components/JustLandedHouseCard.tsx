@@ -3,8 +3,12 @@
 
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import React from 'react';
-import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
+import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
+import { subscribeToProperty } from '../app/api/properties/client/subscribe';
+import { useUserStore } from '../store/userInfoStore';
+import { useFilterStore } from '../store/useFilterStore';
 
 const HouseCard = ({ house }) => {
   let locale = '';
@@ -15,17 +19,17 @@ const HouseCard = ({ house }) => {
   }
 
   const t = useTranslations('HouseCard');
-  const price = house.pricePerWeek;
+  const price = house.price;
   const scoreValue = house.averageScore.toFixed(1);
-  if (house.addressLine1 == null) {
-    house.addressLine1 = 'Unknown';
+  if (house.address == null) {
+    house.address = 'Unknown';
   }
 
   if (house.addressLine2 == null) {
     house.addressLine2 = 'Unknown';
   }
 
-  house.addressLine1 = house.addressLine1
+  house.address = house.address
     .replaceAll('-', ' ')
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -64,15 +68,15 @@ const HouseCard = ({ house }) => {
     house.keywords = '';
   }
 
-  if (house.descriptionCN == null) {
-    house.descriptionCN = '';
+  if (house.descriptionCn == null) {
+    house.descriptionCn = '';
   }
 
   let description = '';
   if (locale == 'en') {
     description = house.keywords.split(',').splice(0, 5);
   } else {
-    description = house.descriptionCN.split(',').splice(0, 7);
+    description = house.descriptionCn.split(',').splice(0, 7);
   }
 
   let propertyType = '';
@@ -88,6 +92,26 @@ const HouseCard = ({ house }) => {
     propertyType = 'Unknown';
   }
 
+  const token = useUserStore(state => state.userInfo.token).token;
+
+  const [isFavorited, setIsFavorited] = useState(false);
+  const toggleFavorite = async e => {
+    e.preventDefault();
+    if (!token) return alert('Login required');
+
+    try {
+      if (isFavorited) {
+        await unsubscribeFromProperty(house.id, token);
+      } else {
+        await subscribeToProperty(house.id, token);
+      }
+      setIsFavorited(!isFavorited);
+    } catch (err) {
+      console.error(err);
+      alert('Error subscribing');
+    }
+  };
+
   return (
     <a
       href={house.url}
@@ -97,20 +121,27 @@ const HouseCard = ({ house }) => {
     >
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-800">
-          {house.addressLine1 || 'Unknown Address'}
+          {house.address || 'Unknown Address'}
         </h3>
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.region || 'Unknown Location'}</span>
         </div>
       </div>
 
       <div className="flex items-center space-x-2">
-        <span className="text-2xl font-semibold text-blue-primary">
+        <span className="text-xl font-semibold text-blue-primary">
           {`$${price}`}{' '}
           <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
         </span>
         <span className={`text-xs ${scoreClass} rounded-full px-2 py-1`}>{scoreText}</span>
+        <button onClick={toggleFavorite} className="focus:outline-none">
+          <FaHeart
+            className={`text-2xl transition-colors duration-200 ${
+              isFavorited ? 'text-pink-500' : 'text-gray-300'
+            }`}
+          />
+        </button>
       </div>
 
       <div className="flex space-x-4 mt-4">

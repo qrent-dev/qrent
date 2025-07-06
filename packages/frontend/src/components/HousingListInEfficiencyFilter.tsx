@@ -14,6 +14,8 @@ const HousingListInEfficiencyFilter = () => {
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [topRegions, setTopRegions] = useState([]);
+
   const { filter, updateFilter } = useFilterStore();
   const { report, updateReport } = filterReportStore();
 
@@ -64,19 +66,15 @@ const HousingListInEfficiencyFilter = () => {
         requestBody.maxBathrooms = parseInt(filter.bathroomMax);
       }
 
+      if (filter.university == 'UNSW') {
+        requestBody.targetSchool = 'University of New South Wales';
+      } else {
+        // else, USYD
+        requestBody.targetSchool = 'University of Sydney';
+      }
+
       if (filter.area && filter.area.length > 0 && !filter.area.includes('Any')) {
         requestBody.regions = filter.area.join(' ');
-      } else {
-        // if filter area is empty, user didn't choose any region
-        // then set region based on school
-        if (filter.university == 'UNSW') {
-          requestBody.targetSchool = 'UNSW';
-          requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
-        } else {
-          // else, USYD
-          requestBody.targetSchool = 'USYD';
-          requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
-        }
       }
 
       if (
@@ -149,14 +147,15 @@ const HousingListInEfficiencyFilter = () => {
         },
         body: JSON.stringify(requestBody),
       });
-      let results = await response.json();
-      // results = results.properties;
+      const results = await response.json();
+      setTopRegions(results.topRegions);
+
       let properties = results.properties;
 
       properties.sort((a, b) => b.averageScore - a.averageScore);
       setListings(properties);
 
-      setTotalPage(Math.ceil(results.propertyCount / 10));
+      setTotalPage(Math.ceil(results.filteredCount / 10));
       updateReport({
         currentListings: results.filteredCount,
         totalListings: results.totalCount,
@@ -165,7 +164,7 @@ const HousingListInEfficiencyFilter = () => {
         topRegions: results.topRegions,
       });
 
-      console.log(results);
+      console.log(listings);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
