@@ -55,6 +55,7 @@ jobs:
           script: |
             cd ~/qrent/
 
+            rm .env
             cat > .env << EOL
             BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
             BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
@@ -69,6 +70,7 @@ jobs:
             EOL
 
             docker compose down
+            docker compose build
             docker compose up -d
             timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
