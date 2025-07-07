@@ -2,63 +2,90 @@ name: Deploy
 
 on:
   push:
-    branches: [ main, backend/prod ]
-  # pull_request:
-  #   branches: [ main ]
+    branches: [main, staging]
+  pull_request:
+    branches: []
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check code formatting
+        run: pnpm lint:check
+
   deploy:
     runs-on: ubuntu-latest
-    environment: production
-    needs: []  # 如果要等待 CI 完成，可以添加依赖
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    needs: [lint] # 等待 CI 完成
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Create env file
-      run: |
-        cp .env.example .env
-        cat << EOF >> .env
-        EOF
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          source: '.,!node_modules'
+          target: '~/qrent/'
 
-    - name: Copy files to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        source: ".,!node_modules"
-        target: "~/qrent/"
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+          password: ${{ secrets.DEPLOY_SERVER_PASSWORD }}
+          script: |
+            cd ~/qrent/
 
-    - name: Deploy application
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        script: |
-          cd ~/qrent/
+            cp .env.example .env
+            cat > .env << EOL
+            BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
+            BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
+            BACKEND_LISTEN_PORT=${{ secrets.BACKEND_LISTEN_PORT }}
+            DB_DATABASE_NAME=${{ secrets.DB_DATABASE_NAME }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_PROPERTY_USER_PASSWORD=${{ secrets.DB_PROPERTY_USER_PASSWORD }}
+            DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+            DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+            DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
+            NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
+            EOL
 
-          export JWT_SECRET='${{ secrets.JWT_SECRET }}'
-          export API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
-          export NSW_TRANSPORT_API_KEY='${{ secrets.NSW_TRANSPORT_API_KEY }}'
-          export PROPERTY_RATING_API_KEY='${{ secrets.PROPERTY_RATING_API_KEY }}'
-          export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
-          export EXPOSE_PORT='3201'
-          export DATABASE_URL='mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@db:3306/qrent'
-          export MYSQL_PROPERTY_USER_PASSWORD='${{ secrets.MYSQL_PROPERTY_USER_PASSWORD }}'
+            docker compose down
+            # docker compose build
+            docker compose up -d
+            timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
 
-          docker compose down
-          docker compose build
-          docker compose up -d
-          timeout 20 bash -c 'while ! docker compose ps | grep -q "healthy"; do sleep 2; done'
-          
-          # Check if the server is responding with status code 200
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3200/echo)
-          if [ "$response" != "200" ]; then
-            echo "Server health check failed! Got status code: $response"
-            exit 1
-          else
-            echo "Server is up and running with status code 200"
-          fi
-          
+            # Check if the server is responding with status code 200
+            for i in {1..10}; do
+              response=$(curl -s -o /dev/null -w "%{http_code}" localhost:${{ secrets.BACKEND_LISTEN_PORT }}/echo)
+              if [ "$response" == "200" ]; then
+                echo "Server is up and running with status code 200"
+                break
+              else
+                echo "Attempt $i: Server not ready yet (got $response), retrying in 3s..."
+                sleep 3
+              fi
+              if [ "$i" -eq 10 ]; then
+                echo "Server failed to start after multiple attempts"
+                exit 1
+              fi
+            done
