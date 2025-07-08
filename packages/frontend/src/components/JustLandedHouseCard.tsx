@@ -18,16 +18,22 @@ const HouseCard = ({ house }) => {
     locale = 'zh';
   }
 
+  house.address = house.address ?? 'Unknown';
+  house.addressLine2 = house.addressLine2 ?? 'Unknown';
+  house.averageScore = house.averageScore ?? 0;
+  house.descriptionCn = house.descriptionCn ?? '';
+  house.descriptionEn = house.descriptionEn ?? '';
+  house.keywords = house.keywords ?? '';
+  house.url = house.url ?? '#';
+  house.availableDate = house.availableDate ?? 'Unknown';
+  house.region = house.region ?? 'Unknown';
+  house.publishedAt = house.publishedAt ? house.publishedAt.split('T')[0] : 'Unknown';
+
+
   const t = useTranslations('HouseCard');
   const price = house.price;
-  const scoreValue = house.averageScore.toFixed(1);
-  if (house.address == null) {
-    house.address = 'Unknown';
-  }
 
-  if (house.addressLine2 == null) {
-    house.addressLine2 = 'Unknown';
-  }
+  const scoreValue = house.averageScore.toFixed(1);
 
   house.address = house.address
     .replaceAll('-', ' ')
@@ -64,13 +70,6 @@ const HouseCard = ({ house }) => {
   }
   house.publishedAt = house.publishedAt.split('T')[0];
 
-  if (house.keywords == null) {
-    house.keywords = '';
-  }
-
-  if (house.descriptionCn == null) {
-    house.descriptionCn = '';
-  }
 
   let description = '';
   if (locale == 'en') {
