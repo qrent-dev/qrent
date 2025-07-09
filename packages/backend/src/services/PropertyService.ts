@@ -151,33 +151,6 @@ class PropertyService {
       filter.averageScore.gte = preferences.minRating;
     }
 
-    // Commute time filter
-    if (preferences.minCommuteTime) {
-      filter.propertySchools = {
-        some: {
-          school: {
-            name: preferences.targetSchool,
-          },
-          commuteTime: {
-            gte: preferences.minCommuteTime,
-          },
-        },
-      };
-    }
-
-    if (preferences.maxCommuteTime) {
-      filter.propertySchools = {
-        some: {
-          school: {
-            name: preferences.targetSchool,
-          },
-          commuteTime: {
-            lte: preferences.maxCommuteTime,
-          },
-        },
-      };
-    }
-
     // Regions filter
     let regionFilter: Prisma.PropertyWhereInput[] = [];
     if (preferences.regions && preferences.regions.length > 0) {
@@ -193,10 +166,15 @@ class PropertyService {
     }
 
     // Target school filter
+    // Commute time filter
     filter.propertySchools = {
       some: {
         school: {
           name: preferences.targetSchool,
+        },
+        commuteTime: {
+          lte: preferences.maxCommuteTime ?? undefined,
+          gte: preferences.minCommuteTime ?? undefined,
         },
       },
     };
@@ -207,21 +185,40 @@ class PropertyService {
     }
 
     // Get properties that match the filter
-    const propertiesRaw = await prisma.property.findMany({
-      include: {
-        region: true,
-      },
-      where: filter,
-      take: pageSize,
-      skip,
-      orderBy,
-    });
+    const properties = await prisma.property
+      .findMany({
+        include: {
+          region: true,
+        },
+        where: filter,
+        take: pageSize,
+        skip,
+        orderBy,
+      })
+      .then(properties => {
+        return Promise.all(
+          properties.map(async p => {
+            const { commuteTime } = await prisma.propertySchool.findFirstOrThrow({
+              select: {
+                commuteTime: true,
+              },
+              where: {
+                propertyId: p.id,
+                school: {
+                  name: preferences.targetSchool,
+                },
+              },
+            });
 
-    const properties = propertiesRaw.map(p => ({
-      ...p,
-      regionId: undefined,
-      region: p.region?.name,
-    }));
+            return {
+              ...p,
+              regionId: undefined,
+              region: p.region?.name,
+              commuteTime,
+            };
+          })
+        );
+      });
 
     const aggregate = await prisma.property.aggregate({
       where: filter,
