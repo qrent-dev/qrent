@@ -77,8 +77,20 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 /////////////////////////////////////////////////////////////////////
 
 // Start server
-const BACKEND_LISTEN_PORT = Number(process.env.BACKEND_LISTEN_PORT) || 3000;
-const BACKEND_LISTEN_HOST = process.env.BACKEND_LISTEN_HOST || 'localhost';
+if (!process.env.BACKEND_LISTEN_HOST) {
+  console.error('BACKEND_LISTEN_HOST environment variable is not set.');
+  // process.exit(1);
+}
+if (!process.env.BACKEND_LISTEN_PORT) {
+  console.error('BACKEND_LISTEN_PORT environment variable is not set.');
+  // process.exit(1);
+}
+if (!process.env.BACKEND_JWT_SECRET_KEY) {
+  console.error('BACKEND_JWT_SECRET_KEY environment variable is not set.');
+  // process.exit(1);
+}
+const BACKEND_LISTEN_PORT = 3201;
+const BACKEND_LISTEN_HOST = '0.0.0.0';
 const server = app.listen(BACKEND_LISTEN_PORT, BACKEND_LISTEN_HOST, async () => {
   console.log(`⚡️ Server started on port ${BACKEND_LISTEN_PORT} at ${BACKEND_LISTEN_HOST}`);
 
