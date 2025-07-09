@@ -19,7 +19,7 @@ jobs:
 
     - name: Build and start services
       run: |
-        rm .env
+        touch .env
         cat > .env << EOL
         BACKEND_JWT_SECRET_KEY=${{ secrets.BACKEND_JWT_SECRET_KEY }}
         BACKEND_LISTEN_HOST=${{ secrets.BACKEND_LISTEN_HOST}}
