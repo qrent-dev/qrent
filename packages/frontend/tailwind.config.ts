@@ -62,7 +62,12 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('@heroui/react'), addVariablesForColors],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('daisyui'),
+    require('@heroui/react'),
+    addVariablesForColors,
+  ],
   safelist: [
     'bg-orange-500',
     'bg-orange-400',
