@@ -5,7 +5,7 @@ import React from 'react';
 const Footer = () => {
   const t = useTranslations('Footer');
   return (
-    <footer className="footer footer-center bg-base-200 text-base-content rounded p-10">
+    <footer className="bg-base-200 text-base-content rounded p-10 flex flex-col items-center space-y-4">
       <nav className="grid grid-flow-col gap-4">
         <Link href="/about" className="link link-hover font-serif">
           {t('about')}

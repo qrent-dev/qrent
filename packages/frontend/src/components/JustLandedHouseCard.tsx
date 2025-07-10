@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
+
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
@@ -89,23 +90,19 @@ const HouseCard = ({ house }) => {
 
       <div className="mt-4">
         <div className="mt-2">
-          {description
-            .map((kw, index) => (
-              <span
-                key={index} // always use a unique key if you map through an array
-                className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs mr-2"
-              >
-                {kw}
-              </span>
-            ))
-            .concat(
-              // If more than 3 keywords, show +X
-              description.length > 3 && (
-                <span key="more" className="text-gray-500 text-xs">
-                  +{description.length - 3}
-                </span>
-              )
-            )}
+          {description.slice(0, 3).map((kw, index) => (
+            <span
+              key={index}
+              className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs mr-2"
+            >
+              {kw}
+            </span>
+          ))}
+          {description.length > 3 && (
+            <span key="more" className="text-gray-500 text-xs">
+              +{description.length - 3}
+            </span>
+          )}
         </div>
       </div>
     </a>
