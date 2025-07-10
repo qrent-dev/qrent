@@ -178,12 +178,12 @@ const HouseCard = ({ house }) => {
           </div>
         )}
 
-        {/* {house.commuteTime != 0 && (
+        {house.commuteTime != 0 && (
           <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
             <FaRegClock className="text-blue-primary" />
             <span className="text-sm">{house.commuteTime}</span>
           </div>
-        )} */}
+        )}
 
         <div className="flex items-center space-x-1 bg-gray-100 text-blue-primary px-3 py-1 rounded-sm">
           <FaCalendarAlt className="text-blue-primary" />
