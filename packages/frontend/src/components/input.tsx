@@ -1,9 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-// Input component extends from shadcnui - https://ui.shadcn.com/docs/components/input
 'use client';
-import * as React from 'react';
+import React from 'react';
 import { cn } from '@/src/lib/utils';
 import { useMotionTemplate, useMotionValue, motion } from 'framer-motion';
 

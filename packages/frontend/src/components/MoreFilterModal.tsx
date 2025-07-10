@@ -13,51 +13,12 @@ import {
 } from '@heroui/react';
 import RatingSlider from './Slider';
 import { useTranslations } from 'next-intl';
-import { SUBURB_OPTIONS } from './HousingFilter';
+import AreaCheckbox from './AreaCheckbox';
 
 const MoreFilterModal = ({ filter, setFilter }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [scrollBehavior] = React.useState<ModalProps['scrollBehavior']>('inside');
   const [isAccordionOpen, setAccordionOpen] = useState(true);
-  const unswAreaOptions = [...SUBURB_OPTIONS.unsw];
-  const usydAreaOptions = [...SUBURB_OPTIONS.usyd];
-
-  const handleCheckboxChange = (option: string) => {
-    // If "Any" is selected
-    if (option === 'Any') {
-      if (filter.area.includes('Any')) {
-        // If "Any" is already selected, unselect it
-        setFilter({
-          ...filter,
-          area: [],
-        });
-      } else {
-        // If "Any" is not selected, select only "Any"
-        setFilter({
-          ...filter,
-          area: ['Any'],
-        });
-      }
-    }
-    // If another option is selected while "Any" was previously selected
-    else if (filter.area.includes('Any')) {
-      setFilter({
-        ...filter,
-        area: [option], // Replace "Any" with the new option
-      });
-    }
-    // Normal toggle behavior for other cases
-    else {
-      const newArea = filter.area.includes(option)
-        ? filter.area.filter(item => item !== option) // Unselect if already selected
-        : [...filter.area, option]; // Select if not selected
-
-      setFilter({
-        ...filter,
-        area: newArea,
-      });
-    }
-  };
 
   const t = useTranslations('Search');
   return (
@@ -147,73 +108,11 @@ const MoreFilterModal = ({ filter, setFilter }) => {
                     </div>
 
                     {isAccordionOpen && (
-                      <div className="mt-2 max-h-52 overflow-y-auto grid grid-cols-2 gap-2">
-                        {/* "Any" option - always shown */}
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="checkbox-any"
-                            value="Any"
-                            checked={filter.area.includes('Any')}
-                            onChange={() => handleCheckboxChange('Any')}
-                            className="mr-2"
-                          />
-                          <label htmlFor="checkbox-any" className="text-gray-600">
-                            Any
-                          </label>
-                        </div>
-
-                        {/* University-specific options */}
-                        {filter.university === 'UNSW' &&
-                          unswAreaOptions.map((option, index) => (
-                            <div key={index} className="flex items-center">
-                              <input
-                                type="checkbox"
-                                id={`checkbox-${index}`}
-                                value={option}
-                                checked={filter.area.includes(option)}
-                                onChange={() => handleCheckboxChange(option)}
-                                className="mr-2"
-                                disabled={
-                                  filter.area.includes('Any') && !filter.area.includes(option)
-                                }
-                              />
-                              <label
-                                htmlFor={`checkbox-${index}`}
-                                className={`text-gray-600 ${
-                                  filter.area.includes('Any') ? 'opacity-50' : ''
-                                }`}
-                              >
-                                {option}
-                              </label>
-                            </div>
-                          ))}
-
-                        {filter.university === 'USYD' &&
-                          usydAreaOptions.map((option, index) => (
-                            <div key={index} className="flex items-center">
-                              <input
-                                type="checkbox"
-                                id={`checkbox-${index}`}
-                                value={option}
-                                checked={filter.area.includes(option)}
-                                onChange={() => handleCheckboxChange(option)}
-                                className="mr-2"
-                                disabled={
-                                  filter.area.includes('Any') && !filter.area.includes(option)
-                                }
-                              />
-                              <label
-                                htmlFor={`checkbox-${index}`}
-                                className={`text-gray-600 ${
-                                  filter.area.includes('Any') ? 'opacity-50' : ''
-                                }`}
-                              >
-                                {option}
-                              </label>
-                            </div>
-                          ))}
-                      </div>
+                      <AreaCheckbox
+                        area={filter.area}
+                        setArea={newArea => setFilter({ ...filter, area: newArea })}
+                        university={filter.university}
+                      />
                     )}
                   </div>
                   {/* Rate */}

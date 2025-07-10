@@ -29,21 +29,6 @@ import image25 from '@/public/GuideDocImg/image (21).jpg';
 import image26 from '@/public/GuideDocImg/image (22).jpg';
 import qrent from '@/public/qrent.jpg';
 
-// 添加一个判断图片是横图还是竖图的函数
-const isLandscapeImage = (imageIndex: number): boolean => {
-  // 这里列出所有横图的图片索引
-  // 假设"关于我在悉尼是如何租到200🔪房之整租篇1"使用的是image5
-  const landscapeImages = [5, 8, 10, 13, 16, 19, 22]; // 这只是示例，请根据实际情况调整
-  return landscapeImages.includes(imageIndex);
-};
-
-// Guides data:
-//      tag
-//      title
-//      author
-//      image
-//      url
-
 const guidesData = [
   {
     tag: '预算&需求',
