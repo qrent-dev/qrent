@@ -155,7 +155,7 @@ const HouseCard = ({ house }) => {
       <div className="flex items-center space-x-2">
         <span className="text-2xl font-semibold text-blue-primary">
           {`$${price}`}{' '}
-          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
+          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">pw</span>
         </span>
       </div>
 
