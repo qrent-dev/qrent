@@ -16,7 +16,7 @@ load_dotenv('.env')
 
 DB_HOST = os.getenv("DB_HOST")
 DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("MYSQL_PROPERTY_USER_PASSWORD")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DATABASE = os.getenv("DB_DATABASE")
 DB_PORT = int(os.getenv("DB_PORT", 3306))
 
@@ -32,16 +32,15 @@ def fetch_db_data():
         if connection.is_connected():
             cursor = connection.cursor(dictionary=True)
             
-            cursor.execute("DESCRIBE property")
+            cursor.execute("DESCRIBE properties")
             columns_info = cursor.fetchall()
             available_columns = [col['Field'] for col in columns_info]
             print(f"Available columns in database: {available_columns}")
             
             desired_columns = [
-                'houseId', 'description', 'availableDate', 
-                'commuteTime_UNSW', 'commuteTime_USYD',
-                'publishedAt', 'keywords', 'averageScore', 
-                'url', 'descriptionCN'
+                'house_id', 'description_en', 'available_date', 
+                'published_at', 'keywords', 'average_score', 
+                'url', 'description_cn'
             ]
             
             existing_columns = [col for col in desired_columns if col in available_columns]
@@ -55,12 +54,13 @@ def fetch_db_data():
                 return pd.DataFrame()
             
             columns_str = ', '.join(existing_columns)
-            sql = f"SELECT {columns_str} FROM property"
+            sql = f"SELECT {columns_str} FROM properties"
             
             cursor.execute(sql)
             db_data = cursor.fetchall()
             cursor.close()
             connection.close()
+            print(f"Successfully fetched data from database with columns: {existing_columns}")
             print(f"Successfully fetched data from database with columns: {existing_columns}")
             return pd.DataFrame(db_data)
         else:
@@ -80,33 +80,69 @@ def scrape_property_data(university):
 
     today_data = pd.read_csv(today_file)
 
-    db_df = fetch_db_data()
-    if not db_df.empty:
-        db_df_unique = db_df.drop_duplicates(subset=['houseId'], keep='first')
-        all_required_cols = ['description', 'availableDate', 'commuteTime_UNSW', 'commuteTime_USYD', 'publishedAt', 'keywords', 'averageScore', 'url', 'descriptionCN']
-
+    yesterday_data = None
+    yesterday_date = (datetime.now() - pd.Timedelta(days=1)).strftime('%y%m%d')
+    yesterday_file = f"{university}_rentdata_{yesterday_date}.csv"
+    
+    if os.path.exists(yesterday_file):
+        print(f"Found previous day's data: {yesterday_file}")
+        yesterday_data = pd.read_csv(yesterday_file)
+        
+        all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
         for col in all_required_cols:
             if col not in today_data.columns:
                 today_data[col] = None
-
-        for col in all_required_cols:
-            if col in db_df_unique.columns:
-                print(f"Mapping column: {col}")
-                today_data[col] = today_data['houseId'].map(
-                    db_df_unique.set_index('houseId')[col]
-                )
-            else:
-                print(f"Column {col} not found in database, keeping as None")
+        
+        if 'houseId' in today_data.columns and 'houseId' in yesterday_data.columns:
+            yesterday_data_unique = yesterday_data.drop_duplicates(subset=['houseId'], keep='first')
+            
+            for col in all_required_cols:
+                if col in yesterday_data_unique.columns:
+                    print(f"Mapping column from yesterday's data: {col}")
+                    today_data[col] = today_data['houseId'].map(
+                        yesterday_data_unique.set_index('houseId')[col]
+                    )
+                else:
+                    print(f"Column {col} not found in yesterday's data, keeping as None")
+        else:
+            print("Warning: 'houseId' column not found in data files. Cannot map from yesterday's data.")
     else:
-        print("No data retrieved from the database. Skipping DB mapping.")
+        print(f"No previous day's data found: {yesterday_file}")
+        db_df = fetch_db_data()
+        if not db_df.empty:
+            if 'houseId' in today_data.columns:
+                db_df_unique = db_df.drop_duplicates(subset=['house_id'], keep='first')
+                all_required_cols = ['description_en', 'available_date', 'published_at', 'keywords', 'average_score', 'url', 'description_cn']
 
-    if 'description' not in today_data.columns:
-        today_data['description'] = None
-    if 'availableDate' not in today_data.columns:
-        today_data['availableDate'] = None
-    missing_property_desc = today_data[today_data['description'].isna()]
+                for col in all_required_cols:
+                    if col not in today_data.columns:
+                        today_data[col] = None
+
+                for col in all_required_cols:
+                    if col in db_df_unique.columns:
+                        print(f"Mapping column from database: {col}")
+                        today_data[col] = today_data['houseId'].map(
+                            db_df_unique.set_index('house_id')[col]
+                        )
+                    else:
+                        print(f"Column {col} not found in database, keeping as None")
+            else:
+                print("Warning: 'houseId' column not found in CSV data. Skipping DB mapping.")
+        else:
+            print("No data retrieved from the database. Skipping DB mapping.")
+
+    if 'description_en' not in today_data.columns:
+        today_data['description_en'] = None
+    if 'available_date' not in today_data.columns:
+        today_data['available_date'] = None
+    
+    missing_property_desc = today_data[
+        (today_data['description_en'].isna()) | 
+        (today_data['description_en'] == 'N/A') |
+        (today_data['description_en'] == '')
+    ]
     num_missing = len(missing_property_desc)
-    print(f"Data missing: {num_missing}")
+    print(f"Properties needing detailed scraping: {num_missing}")
     
     chrome_options = Options()
     chrome_options.add_argument('--headless')
@@ -171,9 +207,9 @@ def scrape_property_data(university):
         description, avail_date, published_at = scrape_data(url)  
         print(f": index={index}, URL={url}, description={description[:100]}, available_date={avail_date}")
 
-        today_data.at[index, 'description'] = description
-        today_data.at[index, 'availableDate'] = avail_date
-        today_data.at[index, 'publishedAt'] = published_at
+        today_data.at[index, 'description_en'] = description
+        today_data.at[index, 'available_date'] = avail_date
+        today_data.at[index, 'published_at'] = published_at
 
     driver.quit()
 

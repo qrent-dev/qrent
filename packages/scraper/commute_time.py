@@ -95,26 +95,65 @@ def update_commute_time(university):
 
     unsw_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
     usyd_coord = "151.18672:-33.888333:EPSG:4326"  # USYD
+    yesterday = (datetime.now() - timedelta(days=1)).strftime('%y%m%d')
+    yesterday_file = f"{university}_rentdata_{yesterday}.csv"
+    
+    if 'commuteTime_UNSW' not in data.columns:
+        data['commuteTime_UNSW'] = None
+    if 'commuteTime_USYD' not in data.columns:
+        data['commuteTime_USYD'] = None
 
-    for index, row in tqdm(missing_commute.iterrows(), total=len(missing_commute), desc="Updating commute time to both universities"):
+    current_commute_col = f'commuteTime_{university}'
+    
+    if os.path.exists(yesterday_file):
+        print(f"Found previous day's data: {yesterday_file}")
+        yesterday_data = pd.read_csv(yesterday_file)
+        
+        if current_commute_col in yesterday_data.columns:
+            if 'houseId' in data.columns and 'houseId' in yesterday_data.columns:
+                yesterday_data_unique = yesterday_data.drop_duplicates(subset=['houseId'], keep='first')
+                print(f"Mapping {current_commute_col} from yesterday's data using houseId")
+                data[current_commute_col] = data['houseId'].map(
+                    yesterday_data_unique.set_index('houseId')[current_commute_col]
+                )
+            elif 'addressLine1' in data.columns and 'addressLine1' in yesterday_data.columns:
+                yesterday_data_unique = yesterday_data.drop_duplicates(subset=['addressLine1'], keep='first')
+                print(f"Mapping {current_commute_col} from yesterday's data using addressLine1")
+                data[current_commute_col] = data['addressLine1'].map(
+                    yesterday_data_unique.set_index('addressLine1')[current_commute_col]
+                )
+            else:
+                print("Warning: No matching key found for mapping yesterday's data")
+        else:
+            print(f"Column {current_commute_col} not found in yesterday's data")
+    else:
+        print(f"No previous day's data found: {yesterday_file}")
+
+    missing_commute = data[data[current_commute_col].isna()]
+    
+    if len(missing_commute) == 0:
+        print(f"No missing {current_commute_col} data found")
+        data.to_csv(output_file, index=False)
+        print(f"save data to:{output_file}")
+        return
+
+    coords = {
+        'UNSW': "151.23143:-33.917129:EPSG:4326",  # UNSW Kensington
+        'USYD': "151.18672:-33.888333:EPSG:4326"   # USYD
+    }
+    
+    target_coord = coords[university]
+
+    for index, row in tqdm(missing_commute.iterrows(), total=len(missing_commute), desc=f"Updating commute time to {university}"):
         origin_address = row['addressLine1']
         origin_coord = address_to_coord(origin_address)
 
         if origin_coord:
-            if pd.isna(row['commuteTime_UNSW']):
-                travel_time_unsw = find_shortest_travel_time(origin_coord, unsw_coord, time_="0900")
-                data.loc[index, 'commuteTime_UNSW'] = travel_time_unsw if travel_time_unsw is not None else 0
-                print(f"UNSW commute time: {travel_time_unsw} minutes")
-            
-            if pd.isna(row['commuteTime_USYD']):
-                travel_time_usyd = find_shortest_travel_time(origin_coord, usyd_coord, time_="0900")
-                data.loc[index, 'commuteTime_USYD'] = travel_time_usyd if travel_time_usyd is not None else 0
-                print(f"USYD commute time: {travel_time_usyd} minutes")
+            travel_time = find_shortest_travel_time(origin_coord, target_coord, time_="0900")
+            data.loc[index, current_commute_col] = travel_time if travel_time is not None else 0
+            print(f"{university} commute time: {travel_time} minutes")
         else:
-            if pd.isna(row['commuteTime_UNSW']):
-                data.loc[index, 'commuteTime_UNSW'] = 0
-            if pd.isna(row['commuteTime_USYD']):
-                data.loc[index, 'commuteTime_USYD'] = 0
+            data.loc[index, current_commute_col] = 0
 
     data.to_csv(output_file, index=False)
     print(f"save data to:{output_file}")
