@@ -1,98 +1,21 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
 import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
 import { subscribeToProperty } from '../app/api/properties/client/subscribe';
 import { useUserStore } from '../store/userInfoStore';
-import { useFilterStore } from '../store/useFilterStore';
+import {
+  getDescription,
+  getPropertyTypeLabel,
+  getScoreClassAndText,
+  initializeHouseData,
+} from '../utils/house';
 
 const HouseCard = ({ house }) => {
-  let locale = '';
-  if (usePathname().startsWith('/en')) {
-    locale = 'en';
-  } else {
-    locale = 'zh';
-  }
-
-  house.address = house.address ?? 'Unknown';
-  house.addressLine2 = house.addressLine2 ?? 'Unknown';
-  house.averageScore = house.averageScore ?? 0;
-  house.descriptionCn = house.descriptionCn ?? '';
-  house.descriptionEn = house.descriptionEn ?? '';
-  house.keywords = house.keywords ?? '';
-  house.url = house.url ?? '#';
-  house.availableDate = house.availableDate ?? 'Unknown';
-  house.region = house.region ?? 'Unknown';
-  house.publishedAt = house.publishedAt ? house.publishedAt.split('T')[0] : 'Unknown';
-
-
   const t = useTranslations('HouseCard');
-  const price = house.price;
-
-  const scoreValue = house.averageScore.toFixed(1);
-
-  house.address = house.address
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  house.addressLine2 = house.addressLine2
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
-  let scoreClass = '';
-  const point = t('points');
-
-  let scoreText = `${scoreValue} ${point}`;
-
-  const top = t('top');
-  const good = t('good');
-
-  // Adjusted text for top-rated houses
-  if (scoreValue !== 'N/A') {
-    const numScore = Number(scoreValue);
-    if (numScore >= 18.3) {
-      scoreClass = 'bg-orange-500 text-white shadow-md shadow-orange-400';
-      scoreText = `${top} ${scoreText}`; // Shortened text
-    } else if (numScore >= 18.0) {
-      scoreClass = 'bg-orange-400 text-white shadow-md shadow-orange-400';
-      scoreText = `${good} ${scoreText}`; // Shortened text
-    } else {
-      scoreClass = 'border border-blue-primary text-blue-primary bg-white';
-      scoreText = `${scoreText}`; // Shortened text
-    }
-  }
-  house.publishedAt = house.publishedAt.split('T')[0];
-
-
-  let description = '';
-  if (locale == 'en') {
-    description = house.keywords.split(',').splice(0, 5);
-  } else {
-    description = house.descriptionCn.split(',').splice(0, 7);
-  }
-
-  let propertyType = '';
-  if (house.propertyType == 1) {
-    propertyType = 'House';
-  } else if (house.propertyType == 2) {
-    propertyType = 'Apartment/Unit/Flat';
-  } else if (house.propertyType == 3) {
-    propertyType = 'Studio';
-  } else if (house.propertyType == 4) {
-    propertyType = 'Semi-detached';
-  } else {
-    propertyType = 'Unknown';
-  }
-
   const token = useUserStore(state => state.userInfo.token).token;
-
   const [isFavorited, setIsFavorited] = useState(false);
   const toggleFavorite = async e => {
     e.preventDefault();
@@ -110,6 +33,11 @@ const HouseCard = ({ house }) => {
       alert('Error subscribing');
     }
   };
+
+  house = initializeHouseData(house);
+  const { scoreClass, scoreText } = getScoreClassAndText(house.averageScore, t);
+  const description = getDescription(house.keywords, house.description, house.descriptionCn);
+  const propertyType = getPropertyTypeLabel(house.propertyType);
 
   return (
     <a
@@ -130,8 +58,8 @@ const HouseCard = ({ house }) => {
 
       <div className="flex items-center space-x-2">
         <span className="text-xl font-semibold text-blue-primary">
-          {`$${price}`}{' '}
-          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
+          {`$${house.price}`}{' '}
+          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">pw</span>
         </span>
         <span className={`text-xs ${scoreClass} rounded-full px-2 py-1`}>{scoreText}</span>
         <button onClick={toggleFavorite} className="focus:outline-none">
