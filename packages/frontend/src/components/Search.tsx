@@ -1,4 +1,4 @@
-import Textbox from './priceDropDown';
+import Textbox from './Textbox';
 import bgImg from '../../public/searchBG.jpg';
 import MoreFilterModal from './MoreFilterModal';
 import { useTranslations } from 'next-intl';
