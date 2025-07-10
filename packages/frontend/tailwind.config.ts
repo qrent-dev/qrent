@@ -62,15 +62,20 @@ export default {
       },
     },
   },
-  plugins: [
-    require('tailwindcss-animate'),
-    require('daisyui'),
-    require('@heroui/react'),
-    addVariablesForColors,
+  plugins: [require('tailwindcss-animate'), require('@heroui/react'), addVariablesForColors],
+  safelist: [
+    'bg-orange-500',
+    'bg-orange-400',
+    'text-white',
+    'shadow-md',
+    'shadow-orange-400',
+    'border',
+    'border-blue-primary',
+    'text-blue-primary',
+    'bg-white',
   ],
 };
 
-// This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
 function addVariablesForColors({ addBase, theme }: any) {
   let allColors = flattenColorPalette(theme('colors'));
   let newVars = Object.fromEntries(

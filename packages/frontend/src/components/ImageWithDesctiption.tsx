@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
-import image1 from '@/src/components/animata/carousel/mockImg/kate-darmody-bZ3cOBjfQdE-unsplash.jpg';
-import image2 from '@/src/components/animata/carousel/mockImg/mykola-kolya-korzh-8jo4TvHtVKM-unsplash.jpg';
-import image3 from '@/src/components/animata/carousel/mockImg/chase-yi-0OvXOVkDaKo-unsplash.jpg';
-import image4 from '@/src/components/animata/carousel/mockImg/timothy-buck-psrloDbaZc8-unsplash.jpg';
+import image1 from '@/public/MockImg/kate-darmody-bZ3cOBjfQdE-unsplash.jpg';
+import image2 from '@/public/MockImg/mykola-kolya-korzh-8jo4TvHtVKM-unsplash.jpg';
+import image3 from '@/public/MockImg/chase-yi-0OvXOVkDaKo-unsplash.jpg';
+import image4 from '@/public/MockImg/timothy-buck-psrloDbaZc8-unsplash.jpg';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 

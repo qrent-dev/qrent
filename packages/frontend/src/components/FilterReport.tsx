@@ -18,8 +18,10 @@ const FilterReport = () => {
       <div className="w-full bg-white rounded-lg shadow p-6 flex flex-col gap-6">
         {/* Top Section: Row layout */}
         <div className="flex flex-col text-gray-800">
-          <div className="border-b-2 border-gray-200 w-max pb-2 text-md font-medium flex flex-col">
-            {t('current-num-filtered-listings')}
+          <div className="border-b-2 border-gray-200 w-full pb-2 text-md font-medium flex flex-col">
+            <span className="break-words whitespace-normal">
+              {t('current-num-filtered-listings')}
+            </span>
             <span className="text-blue-primary text-2xl">
               {report.currentListings} / {report.totalListings}
             </span>

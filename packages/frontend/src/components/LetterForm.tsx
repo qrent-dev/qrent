@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
+//@ts-nocheck
 'use client';
 
 import { ChevronDown } from 'lucide-react';
@@ -11,9 +10,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 const LetterForm = () => {
   const [openAccordion, setOpenAccordion] = useState(1);
   const [isCoverLetter, setIsCoverLetter] = useState(true);
-
+  const [requiredDocs, setRequiredDocs] = useState([]);
+  const [showFlatmate, setShowFlatmate] = useState(false);
+  const [optionalDocs, setOptionalDocs] = useState([]);
   const t = useTranslations('PrepareDocuments');
-
   const [CLInfo, setCLInfo] = useState({
     name: '',
     university: '',
@@ -26,7 +26,24 @@ const LetterForm = () => {
     previousExperiences: [],
     personality: [],
     bgInfo: '',
-    // listOfDoc: "",
+  });
+  const [PLInfo, setPLInfo] = useState({
+    fatherName: '',
+    motherName: '',
+    fatherContactNum: '',
+    motherContactNum: '',
+    contactEmail: '',
+    studentName: '',
+    homeAddress: '',
+    weeklyRent: '',
+    livingExpenses: '',
+    sourceOfFunds: '',
+    accountBalance: '',
+    annualIncome: '',
+    proofDocs: '',
+    prepayRent: '',
+    liabilityStatement: '',
+    otherCommitments: '',
   });
 
   const financialStatementOpts = [
@@ -35,6 +52,21 @@ const LetterForm = () => {
     t('proof-of-income'),
     t('scholarship'),
   ];
+  const personalityOpts = [
+    t('no-smoke'),
+    t('no-pets'),
+    t('quiet-lifestyle'),
+    t('tidy'),
+    t('no-party'),
+    t('regular-schedule'),
+  ];
+  const sourceOfFundsOpts = [
+    t('salary-income'),
+    t('savings'),
+    t('property-income'),
+    t('investment-income'),
+  ];
+  const proofDocsOpts = [t('bank-statement'), t('income-proof'), t('property-proof'), t('tax')];
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -48,15 +80,6 @@ const LetterForm = () => {
       return { ...prevState, financialStatement: newProofOfFunds };
     });
   };
-
-  const personalityOpts = [
-    t('no-smoke'),
-    t('no-pets'),
-    t('quiet-lifestyle'),
-    t('tidy'),
-    t('no-party'),
-    t('regular-schedule'),
-  ];
 
   const handlePersonalityCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -80,32 +103,6 @@ const LetterForm = () => {
     }));
   };
 
-  const [PLInfo, setPLInfo] = useState({
-    fatherName: '',
-    motherName: '',
-    fatherContactNum: '',
-    motherContactNum: '',
-    contactEmail: '',
-    studentName: '',
-    homeAddress: '',
-    weeklyRent: '',
-    livingExpenses: '',
-    sourceOfFunds: '',
-    accountBalance: '',
-    annualIncome: '',
-    proofDocs: '',
-    prepayRent: '',
-    liabilityStatement: '',
-    otherCommitments: '',
-  });
-
-  const sourceOfFundsOpts = [
-    t('salary-income'),
-    t('savings'),
-    t('property-income'),
-    t('investment-income'),
-  ];
-
   const handleSourceFundsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
@@ -118,11 +115,6 @@ const LetterForm = () => {
       return { ...prevState, sourceOfFunds: source };
     });
   };
-
-  const [requiredDocs, setRequiredDocs] = useState([]);
-  const [optionalDocs, setOptionalDocs] = useState([]);
-
-  const proofDocsOpts = [t('bank-statement'), t('income-proof'), t('property-proof'), t('tax')];
 
   const handleProofDocsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -145,7 +137,6 @@ const LetterForm = () => {
     setIsCoverLetter(isCoverLetter);
   };
 
-  // Add a new empty rental experience
   const addExperience = () => {
     setCLInfo({
       ...CLInfo,
@@ -153,37 +144,9 @@ const LetterForm = () => {
     });
   };
 
-  // Update an experience at a specific index
-  const handleExperienceChange = (index, value) => {
-    const updatedExperiences = [...CLInfo.previousExperiences];
-    updatedExperiences[index] = value;
-    setCLInfo({ ...CLInfo, previousExperiences: updatedExperiences });
-  };
-
-  // Remove an experience at a specific index
   const removeExperience = index => {
     const updatedExperiences = CLInfo.previousExperiences.filter((_, i) => i !== index);
     setCLInfo({ ...CLInfo, previousExperiences: updatedExperiences });
-  };
-
-  const [showFlatmate, setShowFlatmate] = useState(false);
-
-  type RentalExperience = {
-    address: string;
-    duration: string;
-    weeklyRent: string;
-    hasReference: boolean;
-    notes: string;
-  };
-
-  const [selectedDocs, setSelectedDocs] = useState([]);
-
-  const handleDocChange = value => {
-    if (selectedDocs.includes(value)) {
-      setSelectedDocs(selectedDocs.filter(doc => doc !== value));
-    } else {
-      setSelectedDocs([...selectedDocs, value]);
-    }
   };
 
   return (
