@@ -61,6 +61,7 @@ def fetch_db_data():
             cursor.close()
             connection.close()
             print(f"Successfully fetched data from database with columns: {existing_columns}")
+            print(f"Successfully fetched data from database with columns: {existing_columns}")
             return pd.DataFrame(db_data)
         else:
             print("Cannot connect to the database")

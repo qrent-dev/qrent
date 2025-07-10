@@ -84,6 +84,17 @@ def update_commute_time(university):
 
     data = pd.read_csv(input_file)
 
+    if 'commuteTime_UNSW' not in data.columns:
+        data['commuteTime_UNSW'] = None
+    if 'commuteTime_USYD' not in data.columns:
+        data['commuteTime_USYD'] = None
+
+    missing_commute = data[
+        data['commuteTime_UNSW'].isna() | data['commuteTime_USYD'].isna()
+    ]
+
+    unsw_coord = "151.23143:-33.917129:EPSG:4326"  # UNSW Kensington
+    usyd_coord = "151.18672:-33.888333:EPSG:4326"  # USYD
     yesterday = (datetime.now() - timedelta(days=1)).strftime('%y%m%d')
     yesterday_file = f"{university}_rentdata_{yesterday}.csv"
     

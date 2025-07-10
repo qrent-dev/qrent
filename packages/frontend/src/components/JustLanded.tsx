@@ -1,22 +1,21 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+//@ts-nocheck
 
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faSpinner, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslations } from 'next-intl';
 import JustLandedHouseCard from './JustLandedHouseCard';
-import { FULL_SUBURB_OPTIONS } from './HousingFilter';
 import { useFilterStore } from '../store/useFilterStore';
 
 const JustLanded = () => {
   const [school, setSchool] = useState('unsw');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error] = useState(null);
   const { filter, updateFilter } = useFilterStore();
+  const t = useTranslations('JustLanded');
 
   const handleViewAllClick = () => {
     updateFilter({ newToday: true });
@@ -26,22 +25,13 @@ const JustLanded = () => {
     setLoading(true);
     try {
       const requestBody = {};
-
-      if (school === 'unsw') {
-        requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
-      } else {
-        requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
-      }
-
+      requestBody.targetSchool =
+        filter.university === 'UNSW' ? 'University of New South Wales' : 'University of Sydney';
       requestBody.page = 1;
-      requestBody.pageSize = 50;
-      requestBody.orderBy = [
-        {
-          publishedAt: 'desc',
-        },
-      ];
+      requestBody.pageSize = 9;
+      requestBody.orderBy = [{ averageScore: 'desc' }];
 
-      console.log(requestBody);
+      console.log('Sending request:', requestBody);
 
       const response = await fetch('/api/properties/search', {
         method: 'POST',
@@ -50,21 +40,12 @@ const JustLanded = () => {
         },
         body: JSON.stringify(requestBody),
       });
+
       let results = await response.json();
       results = results.properties;
-
-      for (const result of results) {
-        if (result.url == 'https://www.domain.com.au/nan' || result.addressLine1 == null) {
-          results.splice(results.indexOf(result), 1);
-        }
-      }
-
-      results.sort((a, b) => b.averageScore - a.averageScore);
-      console.log(results);
-
-      results = results.slice(0, 9);
-
       setListings(results);
+
+      console.log(results);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -75,8 +56,6 @@ const JustLanded = () => {
   useEffect(() => {
     fetchData();
   }, [school]);
-
-  const t = useTranslations('JustLanded');
 
   return (
     <div className="max-w-screen-lg mx-auto mt-10 px-6">

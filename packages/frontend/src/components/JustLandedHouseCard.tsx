@@ -2,91 +2,43 @@
 // @ts-nocheck
 
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
-import React from 'react';
-import { FaBath, FaBed, FaMapMarkerAlt } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
+import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
+import { subscribeToProperty } from '../app/api/properties/client/subscribe';
+import { useUserStore } from '../store/userInfoStore';
+import {
+  getDescription,
+  getPropertyTypeLabel,
+  getScoreClassAndText,
+  initializeHouseData,
+} from '../utils/house';
 
 const HouseCard = ({ house }) => {
-  let locale = '';
-  if (usePathname().startsWith('/en')) {
-    locale = 'en';
-  } else {
-    locale = 'zh';
-  }
-
   const t = useTranslations('HouseCard');
-  const price = house.pricePerWeek;
-  const scoreValue = house.averageScore.toFixed(1);
-  if (house.addressLine1 == null) {
-    house.addressLine1 = 'Unknown';
-  }
+  const token = useUserStore(state => state.userInfo.token).token;
+  const [isFavorited, setIsFavorited] = useState(false);
+  const toggleFavorite = async e => {
+    e.preventDefault();
+    if (!token) return alert('Login required');
 
-  if (house.addressLine2 == null) {
-    house.addressLine2 = 'Unknown';
-  }
-
-  house.addressLine1 = house.addressLine1
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  house.addressLine2 = house.addressLine2
-    .replaceAll('-', ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
-  let scoreClass = '';
-  const point = t('points');
-
-  let scoreText = `${scoreValue} ${point}`;
-
-  const top = t('top');
-  const good = t('good');
-
-  // Adjusted text for top-rated houses
-  if (scoreValue !== 'N/A') {
-    const numScore = Number(scoreValue);
-    if (numScore >= 18.3) {
-      scoreClass = 'bg-orange-500 text-white shadow-md shadow-orange-400';
-      scoreText = `${top} ${scoreText}`; // Shortened text
-    } else if (numScore >= 18.0) {
-      scoreClass = 'bg-orange-400 text-white shadow-md shadow-orange-400';
-      scoreText = `${good} ${scoreText}`; // Shortened text
-    } else {
-      scoreClass = 'border border-blue-primary text-blue-primary bg-white';
-      scoreText = `${scoreText}`; // Shortened text
+    try {
+      if (isFavorited) {
+        await unsubscribeFromProperty(house.id, token);
+      } else {
+        await subscribeToProperty(house.id, token);
+      }
+      setIsFavorited(!isFavorited);
+    } catch (err) {
+      console.error(err);
+      alert('Error subscribing');
     }
-  }
-  house.publishedAt = house.publishedAt.split('T')[0];
+  };
 
-  if (house.keywords == null) {
-    house.keywords = '';
-  }
-
-  if (house.descriptionCN == null) {
-    house.descriptionCN = '';
-  }
-
-  let description = '';
-  if (locale == 'en') {
-    description = house.keywords.split(',').splice(0, 5);
-  } else {
-    description = house.descriptionCN.split(',').splice(0, 7);
-  }
-
-  let propertyType = '';
-  if (house.propertyType == 1) {
-    propertyType = 'House';
-  } else if (house.propertyType == 2) {
-    propertyType = 'Apartment/Unit/Flat';
-  } else if (house.propertyType == 3) {
-    propertyType = 'Studio';
-  } else if (house.propertyType == 4) {
-    propertyType = 'Semi-detached';
-  } else {
-    propertyType = 'Unknown';
-  }
+  house = initializeHouseData(house);
+  const { scoreClass, scoreText } = getScoreClassAndText(house.averageScore, t);
+  const description = getDescription(house.keywords, house.description, house.descriptionCn);
+  const propertyType = getPropertyTypeLabel(house.propertyType);
 
   return (
     <a
@@ -97,20 +49,27 @@ const HouseCard = ({ house }) => {
     >
       <div className="mb-4">
         <h3 className="text-xl font-semibold text-gray-800">
-          {house.addressLine1 || 'Unknown Address'}
+          {house.address || 'Unknown Address'}
         </h3>
         <div className="flex items-center space-x-1 mt-2 mb-4">
           <FaMapMarkerAlt className="text-gray-700 text-sm" />
-          <span className="text-sm text-gray-500">{house.addressLine2 || 'Unknown Location'}</span>
+          <span className="text-sm text-gray-500">{house.region || 'Unknown Location'}</span>
         </div>
       </div>
 
       <div className="flex items-center space-x-2">
-        <span className="text-2xl font-semibold text-blue-primary">
-          {`$${price}`}{' '}
-          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">/week</span>
+        <span className="text-xl font-semibold text-blue-primary">
+          {`$${house.price}`}{' '}
+          <span className="text-xs font-normal text-gray-600 whitespace-nowrap">pw</span>
         </span>
         <span className={`text-xs ${scoreClass} rounded-full px-2 py-1`}>{scoreText}</span>
+        <button onClick={toggleFavorite} className="focus:outline-none">
+          <FaHeart
+            className={`text-2xl transition-colors duration-200 ${
+              isFavorited ? 'text-pink-500' : 'text-gray-300'
+            }`}
+          />
+        </button>
       </div>
 
       <div className="flex space-x-4 mt-4">
@@ -131,23 +90,19 @@ const HouseCard = ({ house }) => {
 
       <div className="mt-4">
         <div className="mt-2">
-          {description
-            .map((kw, index) => (
-              <span
-                key={index} // always use a unique key if you map through an array
-                className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs mr-2"
-              >
-                {kw}
-              </span>
-            ))
-            .concat(
-              // If more than 3 keywords, show +X
-              description.length > 3 && (
-                <span key="more" className="text-gray-500 text-xs">
-                  +{description.length - 3}
-                </span>
-              )
-            )}
+          {description.slice(0, 3).map((kw, index) => (
+            <span
+              key={index}
+              className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs mr-2"
+            >
+              {kw}
+            </span>
+          ))}
+          {description.length > 3 && (
+            <span key="more" className="text-gray-500 text-xs">
+              +{description.length - 3}
+            </span>
+          )}
         </div>
       </div>
     </a>

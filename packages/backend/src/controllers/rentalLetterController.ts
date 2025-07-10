@@ -2,7 +2,16 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 
 function buildUserPrompt(data: any): string {
-  const { basicInfo, livingPlan, education, rentalHistory, financialSupport, roommates, lifestyle, attachments } = data;
+  const {
+    basicInfo,
+    livingPlan,
+    education,
+    rentalHistory,
+    financialSupport,
+    roommates,
+    lifestyle,
+    attachments,
+  } = data;
 
   const lines: string[] = [];
 
@@ -17,9 +26,12 @@ function buildUserPrompt(data: any): string {
   }
 
   // 2. Rental Plan
-  lines.push(`Rental intention: Looking to rent starting ${livingPlan.startDate} for ${livingPlan.durationMonths} months.`);
+  lines.push(
+    `Rental intention: Looking to rent starting ${livingPlan.startDate} for ${livingPlan.durationMonths} months.`
+  );
   lines.push(`Preferred budget: AUD ${livingPlan.budgetAUD}/week`);
-  if (livingPlan.locationPreference) lines.push(`Preferred location: ${livingPlan.locationPreference}`);
+  if (livingPlan.locationPreference)
+    lines.push(`Preferred location: ${livingPlan.locationPreference}`);
 
   // 3. Education
   if (education) {
@@ -38,7 +50,9 @@ function buildUserPrompt(data: any): string {
 
   // 5. Financials
   if (financialSupport) {
-    lines.push(`Financial support: ${financialSupport.type}, approx. AUD ${financialSupport.amountAUD}.`);
+    lines.push(
+      `Financial support: ${financialSupport.type}, approx. AUD ${financialSupport.amountAUD}.`
+    );
     if (financialSupport.details) lines.push(`Details: ${financialSupport.details}`);
   }
 
@@ -64,7 +78,6 @@ function buildUserPrompt(data: any): string {
 }
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-console.log("🔑 DeepSeek API Key loaded:", DEEPSEEK_API_KEY);
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 
 const SYSTEM_PROMPT = `

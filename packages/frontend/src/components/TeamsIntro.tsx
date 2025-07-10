@@ -39,7 +39,7 @@ export function ExpandableCardDemo() {
     {
       description: 'Backend Developer  ',
       title: 'Tianyang Chen',
-      src: tingBaiImage.src,
+      src: null,
       ctaText: 'Visit',
       ctaLink: 'https://ui.aceternity.com/templates',
       content: () => {

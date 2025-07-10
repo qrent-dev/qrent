@@ -22,6 +22,8 @@ export const useFilterStore = create()(
         page: 1,
         page_size: 10,
         newToday: false, // new filter, for merging justlanded and efficiency filter page together
+        myFav: false,
+        subscriptions: [],
       },
       updateFilter: newFilter => {
         set({ filter: { ...get().filter, ...newFilter } });

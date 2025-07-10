@@ -9,15 +9,13 @@ import { Alert } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '../../../store/userInfoStore';
 
-async function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-}
-
 const Login = () => {
   const t = useTranslations('Login');
+  const { setUser } = useUserStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
 
   const [isSuccVisible, setisSuccVisible] = useState(false);
   const succTitle = t('succ-title');
@@ -30,14 +28,9 @@ const Login = () => {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const { setUser } = useUserStore();
-
     e.preventDefault();
-    try {
-      console.log(email, password);
-      const baseurl = await getApiBaseUrl();
-      console.log(baseurl);
 
+    try {
       const res = await fetch('/auth/login', {
         method: 'POST',
         headers: {
@@ -50,19 +43,21 @@ const Login = () => {
         throw new Error('Login failed');
       }
 
+      const token = await res.json();
+      setToken(token);
+
       console.log('Login successful');
       setUser({
-        name: email.split('@')[0],
-
+        name: email.slice(0, 4),
         email: email,
-
+        token: token,
       });
 
       setisSuccVisible(true);
 
       setTimeout(() => {
         router.push('/');
-      }, 2000);
+      }, 1000);
     } catch (err) {
       console.log(err);
       setisFailVisible(true);
@@ -75,11 +70,6 @@ const Login = () => {
       <p className="text-black text-sm max-w-sm mt-2 ">{t('login-to-continue')}</p>
 
       <form className="my-8" onSubmit={handleSubmit}>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="name">{t('user-name')}</Label>
-          <Input id="name" placeholder="name" type="name" />
-        </LabelInputContainer>
-
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">{t('email-address')}</Label>
           <Input

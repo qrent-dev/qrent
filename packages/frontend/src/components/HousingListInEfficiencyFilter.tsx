@@ -5,7 +5,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 import HouseCard from './HouseCard';
-import { FULL_SUBURB_OPTIONS, SUBURB_OPTIONS } from './HousingFilter';
 import { filterReportStore } from '../store/filterReportStore';
 
 const HousingListInEfficiencyFilter = () => {
@@ -14,157 +13,107 @@ const HousingListInEfficiencyFilter = () => {
   const [error] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [topRegions, setTopRegions] = useState([]);
+
   const { filter, updateFilter } = useFilterStore();
-  const { report, updateReport } = filterReportStore();
+  const { updateReport } = filterReportStore();
 
   const topRef = useRef();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const requestBody = {};
+      const requestBody: Record<string, any> = {};
 
-      if (filter.priceMin !== 'Any' && filter.priceMin !== '' && filter.priceMin !== undefined) {
-        requestBody.minPrice = parseInt(filter.priceMin);
+      const isValid = (val: any) =>
+        val !== 'Any' && val !== '' && val !== undefined && val !== null;
+
+      const parseIfValid = (val: any) => (isValid(val) ? parseInt(val) : undefined);
+
+      // Price
+      if (isValid(filter.priceMin)) requestBody.minPrice = parseIfValid(filter.priceMin);
+      if (isValid(filter.priceMax)) requestBody.maxPrice = parseIfValid(filter.priceMax);
+
+      // Bedrooms
+      if (isValid(filter.bedroomMin)) requestBody.minBedrooms = parseIfValid(filter.bedroomMin);
+      if (isValid(filter.bedroomMax)) requestBody.maxBedrooms = parseIfValid(filter.bedroomMax);
+
+      // Bathrooms
+      if (isValid(filter.bathroomMin)) requestBody.minBathrooms = parseIfValid(filter.bathroomMin);
+      if (isValid(filter.bathroomMax)) requestBody.maxBathrooms = parseIfValid(filter.bathroomMax);
+
+      // Commute time
+      if (isValid(filter.commuteTimeMin))
+        requestBody.minCommuteTime = parseIfValid(filter.commuteTimeMin);
+      if (isValid(filter.commuteTimeMax))
+        requestBody.maxCommuteTime = parseIfValid(filter.commuteTimeMax);
+
+      // Rating
+      requestBody.minRating = parseIfValid(filter.rate) ?? 0;
+
+      // Property type
+      const propertyTypeMap: Record<string, number> = {
+        House: 1,
+        'Apartment/Unit/Flat': 2,
+        Studio: 3,
+        'Semi-detached': 4,
+      };
+      if (isValid(filter.propertyType)) {
+        requestBody.propertyType = propertyTypeMap[filter.propertyType];
       }
 
-      if (filter.priceMax !== 'Any' && filter.priceMax !== '' && filter.priceMax !== undefined) {
-        requestBody.maxPrice = parseInt(filter.priceMax);
-      }
+      // School
+      requestBody.targetSchool =
+        filter.university === 'UNSW' ? 'University of New South Wales' : 'University of Sydney';
 
-      if (
-        filter.bedroomMin !== 'Any' &&
-        filter.bedroomMin !== '' &&
-        filter.bedroomMin !== undefined
-      ) {
-        requestBody.minBedrooms = parseInt(filter.bedroomMin);
-      }
-
-      if (
-        filter.bedroomMax !== 'Any' &&
-        filter.bedroomMax !== '' &&
-        filter.bedroomMax !== undefined
-      ) {
-        requestBody.maxBedrooms = parseInt(filter.bedroomMax);
-      }
-
-      if (
-        filter.bathroomMin !== 'Any' &&
-        filter.bathroomMin !== '' &&
-        filter.bathroomMin !== undefined
-      ) {
-        requestBody.minBathrooms = parseInt(filter.bathroomMin);
-      }
-
-      if (
-        filter.bathroomMax !== 'Any' &&
-        filter.bathroomMax !== '' &&
-        filter.bathroomMax !== undefined
-      ) {
-        requestBody.maxBathrooms = parseInt(filter.bathroomMax);
-      }
-
-      if (filter.area && filter.area.length > 0 && !filter.area.includes('Any')) {
+      // Area
+      if (Array.isArray(filter.area) && filter.area.length && !filter.area.includes('Any')) {
         requestBody.regions = filter.area.join(' ');
-      } else {
-        // if filter area is empty, user didn't choose any region
-        // then set region based on school
-        if (filter.university == 'UNSW') {
-          requestBody.regions = FULL_SUBURB_OPTIONS.unsw.join(' ');
-        } else {
-          // else, USYD
-          requestBody.regions = FULL_SUBURB_OPTIONS.usyd.join(' ');
-        }
       }
 
-      if (
-        filter.propertyType !== 'Any' &&
-        filter.propertyType !== '' &&
-        filter.propertyType !== undefined
-      ) {
-        switch (filter.propertyType) {
-          case 'House':
-            requestBody.propertyType = 1;
-            break;
-          case 'Apartment/Unit/Flat':
-            requestBody.propertyType = 2;
-            break;
-          case 'Studio':
-            requestBody.propertyType = 3;
-            break;
-          case 'Semi-detached':
-            requestBody.propertyType = 4;
-            break;
-        }
-      }
-
-      if (
-        filter.commuteTimeMin !== 'Any' &&
-        filter.commuteTimeMin !== '' &&
-        filter.commuteTimeMin !== undefined
-      ) {
-        requestBody.minCommuteTime = parseInt(filter.commuteTimeMin);
-      }
-
-      if (
-        filter.commuteTimeMax !== 'Any' &&
-        filter.commuteTimeMax !== '' &&
-        filter.commuteTimeMax !== undefined
-      ) {
-        requestBody.maxCommuteTime = parseInt(filter.commuteTimeMax);
-      }
-
-      requestBody.minRating = parseInt(filter.rate);
-
-      if (
-        filter.avaliableDate !== 'Any' &&
-        filter.avaliableDate !== '' &&
-        filter.avaliableDate !== undefined
-      ) {
+      // Move-in date
+      if (isValid(filter.avaliableDate)) {
         requestBody.moveInDate = filter.avaliableDate;
       }
 
+      // New Today
       if (filter.newToday) {
-        // if the user only want to see the housing today
         requestBody.publishedAt = new Date().toISOString().split('T')[0];
       }
 
       requestBody.page = currentPage;
       requestBody.pageSize = 10;
+      requestBody.orderBy = [{ averageScore: 'desc' }];
 
-      requestBody.orderBy = [
-        {
-          averageScore: 'desc',
-        },
-      ];
-
-      console.log(requestBody);
+      console.log('Sending request:', requestBody);
 
       const response = await fetch('/api/properties/search', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
-      let results = await response.json();
-      // results = results.properties;
-      let properties = results.properties;
 
-      properties.sort((a, b) => b.averageScore - a.averageScore);
-      setListings(properties);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
 
-      setTotalPage(Math.ceil(results.propertyCount / 10));
+      const results = await response.json();
+
+      // Sort and set
+      const sorted = results.properties.sort((a, b) => b.averageScore - a.averageScore);
+      setListings(sorted);
+      setTopRegions(results.topRegions);
+
+      setTotalPage(Math.ceil(results.filteredCount / 10));
       updateReport({
-        currentListings: results.propertyCount,
-        totalListings: results.totalProperties,
-        avgRent: results.averageWeeklyPrice,
+        currentListings: results.filteredCount,
+        totalListings: results.totalCount,
+        avgRent: results.averagePrice,
         avgTravelTime: results.averageCommuteTime,
+        topRegions: results.topRegions,
       });
-
-      console.log(results);
     } catch (error) {
-      console.error('Error fetching properties:', error);
+      console.error('Failed to fetch properties:', error);
     } finally {
       setLoading(false);
     }
