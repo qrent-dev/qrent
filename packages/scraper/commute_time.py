@@ -191,7 +191,7 @@ def update_commute_time(university):
             failed_calculations += 1
             continue
         
-        print(f"\nindex {index}: {origin_address[:50]}...")
+        print(f"\n index {index}: {origin_address[:50]}...")
         
         transit_time = calculator.calculate_transit_time(origin_address, destination)
         
