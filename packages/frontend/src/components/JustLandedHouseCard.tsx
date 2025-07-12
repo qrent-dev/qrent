@@ -4,8 +4,6 @@
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { FaBath, FaBed, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
-import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
-import { subscribeToProperty } from '../app/api/properties/client/subscribe';
 import { useUserStore } from '../store/userInfoStore';
 import {
   getDescription,

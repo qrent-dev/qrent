@@ -11,10 +11,7 @@ import {
   FaRegClock,
   FaHeart,
 } from 'react-icons/fa';
-
-import { subscribeToProperty } from '../app/api/properties/client/subscribe';
 import { useUserStore } from '../store/userInfoStore';
-import { unsubscribeFromProperty } from '../app/api/properties/client/ubsubscribe';
 import {
   getDescription,
   getPropertyTypeLabel,
@@ -38,7 +35,7 @@ const HouseCard = ({ house }) => {
     try {
       if (isFavorited) {
         await fetch(`/api/properties/${house.id}/unsubscribe`, {
-          method: 'PUT',
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

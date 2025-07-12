@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const propertyId = await params.id;
+  const { id } = await params;
+
   const token = req.headers.get('Authorization');
 
   const res = await fetch(
-    `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/${propertyId}/unsubscribe`,
+    `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/${id}/unsubscribe`,
     {
       method: 'DELETE',
       headers: {

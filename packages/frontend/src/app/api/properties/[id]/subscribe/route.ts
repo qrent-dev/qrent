@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  console.log(
-    `🔔 API Route HIT: ${req.method} /api/properties/${params.id}/${req.method === 'PUT' ? 'subscribe' : 'unsubscribe'}`
-  );
-
-  const propertyId = params.id;
+  const { id } = await params;
   const token = req.headers.get('Authorization');
 
   const res = await fetch(
-    `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/${propertyId}/subscribe`,
+    `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/${id}/subscribe`,
     {
       method: 'PUT',
       headers: {
