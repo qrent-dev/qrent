@@ -21,10 +21,14 @@ import {
   getScoreClassAndText,
   initializeHouseData,
 } from '../utils/house';
+import { useFilterStore } from '../store/useFilterStore';
 
 const HouseCard = ({ house }) => {
   const t = useTranslations('HouseCard');
-  const [isFavorited, setIsFavorited] = useState(false);
+  const { filter, updateFilter } = useFilterStore();
+  const [isFavorited, setIsFavorited] = useState(() => {
+    return filter.subscriptions?.some(sub => sub.id === house.id);
+  });
   const token = useUserStore(state => state.userInfo.token).token;
 
   const toggleFavorite = async e => {
@@ -33,9 +37,21 @@ const HouseCard = ({ house }) => {
 
     try {
       if (isFavorited) {
-        await unsubscribeFromProperty(house.id, token);
+        await fetch(`/api/properties/${house.id}/unsubscribe`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
       } else {
-        await subscribeToProperty(house.id, token);
+        await fetch(`/api/properties/${house.id}/subscribe`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
       setIsFavorited(!isFavorited);
     } catch (err) {
