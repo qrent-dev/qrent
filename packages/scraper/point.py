@@ -1,11 +1,15 @@
 import os
-import re
-import dashscope
+import time
 import pandas as pd
-from tqdm import tqdm
-from datetime import datetime, timedelta
+import numpy as np
+import dashscope
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
+import glob
+import re
+from datetime import datetime
 from dotenv import load_dotenv
+
 load_dotenv('.env')
 
 API_KEY_POINT = os.getenv('PROPERTY_RATING_API_KEY')
@@ -23,7 +27,7 @@ NUM_CALLS = 2         # 调用次数
 SCORES_PER_CALL = 4   # 每次调用返回4组评分
 TOTAL_SCORES = NUM_CALLS * SCORES_PER_CALL
 
-SYSTEM_PROMPT = """你是一位专业的房屋居住质量评估员，需要对房屋进行“分项打分”和“总评分”，标准如下：
+SYSTEM_PROMPT = """你是一位专业的房屋居住质量评估员，需要对房屋进行"分项打分"和"总评分"，标准如下：
 1. 房屋质量 (0~10 分)：
    - 如果房屋缺少翻新、老旧或有明显缺陷，可给 3 分以下。
    - 普通装修或信息不足，可给 4~6 分。
@@ -86,7 +90,7 @@ def call_model_for_scores(description: str) -> list:
         ]
         try:
             response = dashscope.Generation.call(
-                api_key=API_KEY_POINT ,
+                api_key=API_KEY_POINT,
                 model=MODEL_NAME,
                 messages=messages,
                 result_format='message',
@@ -108,7 +112,7 @@ def call_model_for_scores(description: str) -> list:
     return all_scores
 
 def process_one_row_scoring(idx: int, row: pd.Series) -> (int, list, float):
-    desc = row['description']
+    desc = row.get('description_en', '')
     if pd.isna(desc) or not desc.strip():
         scores = [0] * TOTAL_SCORES
         avg_score = 0
@@ -118,30 +122,36 @@ def process_one_row_scoring(idx: int, row: pd.Series) -> (int, list, float):
     return (idx, scores, avg_score)
 
 def score_properties_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
-    if 'description' not in df.columns:
-        raise ValueError("do not have 'description'")
     for i in range(1, TOTAL_SCORES + 1):
         if f"Score_{i}" not in df.columns:
             df[f"Score_{i}"] = None
-    if 'averageScore' not in df.columns:
-        df['averageScore'] = None
-    to_score = df[df['averageScore'].isna()]
-    print(f"num of the marking: {len(to_score)}")
+    if 'average_score' not in df.columns:
+        df['average_score'] = None
+    
+    to_score = df[
+        (df['average_score'].isna()) | 
+        (df['average_score'] == 0)
+    ]
+    print(f"Number of properties to score (NaN or 0): {len(to_score)}")
+    
     if len(to_score) == 0:
         return df
+    
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for idx, row in to_score.iterrows():
             futures.append(executor.submit(process_one_row_scoring, idx, row))
-        for f in tqdm(as_completed(futures), total=len(futures), desc="marking"):
+        
+        for f in tqdm(as_completed(futures), total=len(futures), desc="Scoring properties"):
             results.append(f.result())
+    
     for (idx, scores, avg_score) in results:
-        base_col = 1
-        for score_val in scores:
-            df.at[idx, f"Score_{base_col}"] = score_val
-            base_col += 1
-        df.at[idx, 'averageScore'] = avg_score
+        for i, score_val in enumerate(scores, 1):
+            if i <= TOTAL_SCORES:
+                df.at[idx, f"Score_{i}"] = score_val
+        df.at[idx, 'average_score'] = avg_score
+        
     return df
 
 def call_model_for_keywords(description: str) -> str:
@@ -164,7 +174,7 @@ def call_model_for_keywords(description: str) -> str:
     ]
     try:
         response = dashscope.Generation.call(
-            api_key=API_KEY_POINT ,
+            api_key=API_KEY_POINT,
             model=MODEL_NAME,
             messages=messages,
             result_format='message',
@@ -176,7 +186,6 @@ def call_model_for_keywords(description: str) -> str:
         )
         if response and response.output and response.output.get("choices"):
             assistant_msg = response.output["choices"][0]["message"]["content"].strip()
-            # Remove any "Keywords:" prefix if exists, case-insensitive.
             if assistant_msg.lower().startswith("keywords:"):
                 assistant_msg = assistant_msg[len("keywords:"):].strip()
             return assistant_msg
@@ -185,7 +194,7 @@ def call_model_for_keywords(description: str) -> str:
     return "N/A"
 
 def process_one_row_keywords(idx: int, row: pd.Series) -> (int, str):
-    desc = row.get('description', '')
+    desc = row.get('description_en', '')
     if pd.isna(desc) or not desc.strip():
         return idx, "N/A"
     keywords = call_model_for_keywords(desc)
@@ -196,20 +205,31 @@ def extract_keywords_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
         df['keywords'] = pd.Series(dtype="string")
     else:
         df['keywords'] = df['keywords'].astype("string")
-    to_extract = df[df['keywords'].isna()]
-    print(f"num of the keywords: {len(to_extract)}")
+    
+    to_extract = df[
+        (df['keywords'].isna()) | 
+        (df['keywords'] == 'N/A') |
+        (df['keywords'] == '')
+    ]
+    print(f"Number of properties needing keyword extraction: {len(to_extract)}")
+    
     if len(to_extract) == 0:
         return df
+    
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for idx, row in to_extract.iterrows():
             futures.append(executor.submit(process_one_row_keywords, idx, row))
-        for f in tqdm(as_completed(futures), total=len(futures), desc="finding keywords"):
+        
+        for f in tqdm(as_completed(futures), total=len(futures), desc="Extracting keywords"):
             results.append(f.result())
+    
     for (idx, kw) in results:
         df.at[idx, 'keywords'] = str(kw)
+    
     return df
+
 def call_model_for_keywords_cn(description: str) -> str:
     messages = [
         {
@@ -247,61 +267,100 @@ def call_model_for_keywords_cn(description: str) -> str:
     return "N/A"
 
 def process_one_row_keywords_cn(idx: int, row: pd.Series) -> (int, str):
-    desc = row.get('description', '')
-    if pd.isna(desc) or not desc.strip():
+    desc = row.get('description_en', '')
+    if pd.isna(desc) or not desc.strip() or desc == 'N/A':
         return idx, "N/A"
     kw_cn = call_model_for_keywords_cn(desc)
     return idx, kw_cn
 
 def extract_keywords_cn_parallel(df: pd.DataFrame, max_workers=5) -> pd.DataFrame:
-    if 'descriptionCN' not in df.columns:
-        df['descriptionCN'] = pd.Series(dtype="string")
+    if 'description_cn' not in df.columns:
+        df['description_cn'] = pd.Series(dtype="string")
     else:
-        df['descriptionCN'] = df['descriptionCN'].astype("string")
-    to_extract = df[df['descriptionCN'].isna()]
-    print(f"num of the Chinese keywords: {len(to_extract)}")
+        df['description_cn'] = df['description_cn'].astype("string")
+    
+    to_extract = df[
+        (df['description_cn'].isna()) | 
+        (df['description_cn'] == 'N/A') |
+        (df['description_cn'] == '')
+    ]
+    print(f"Number of properties needing Chinese keyword extraction: {len(to_extract)}")
+    
     if len(to_extract) == 0:
         return df
+    
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for idx, row in to_extract.iterrows():
             futures.append(executor.submit(process_one_row_keywords_cn, idx, row))
-        for f in tqdm(as_completed(futures), total=len(futures), desc="finding Chinese keywords"):
+        
+        for f in tqdm(as_completed(futures), total=len(futures), desc="Extracting Chinese keywords"):
             results.append(f.result())
+    
     for (idx, kw_cn) in results:
-        df.at[idx, 'descriptionCN'] = str(kw_cn)
+        df.at[idx, 'description_cn'] = str(kw_cn)
+    
     return df
 
 def process_missing_scores_and_keywords(file_path: str):
     if not os.path.exists(file_path):
-        print(f" {file_path} do not exist.")
+        print(f"File not found: {file_path}")
         return
+    
+    print(f"Processing file: {file_path}")
     df = pd.read_csv(file_path, encoding="utf-8-sig")
+    
     df = score_properties_parallel(df, max_workers=2)
+    
     df = extract_keywords_cn_parallel(df, max_workers=2)
+    
     df = extract_keywords_parallel(df, max_workers=2)
     
-    # 调整列顺序：将 descriptionCN 插入到 description 与 publishedAt 之间
-    cols = list(df.columns)
-    if "description" in cols and "publishedAt" in cols:
-        if "descriptionCN" in cols:
-            cols.remove("descriptionCN")
-        idx = cols.index("description") + 1
-        cols.insert(idx, "descriptionCN")
+    cols = df.columns.tolist()
+    if 'description_cn' in cols and 'description_en' in cols and 'published_at' in cols:
+        cols.remove('description_cn')
+        desc_en_idx = cols.index('description_en')
+        cols.insert(desc_en_idx + 1, 'description_cn')
         df = df[cols]
     
-    score_cols = [col for col in df.columns if col.startswith("Score_")]
-    if "Average Score" in df.columns:
-        score_cols.append("Average Score")
-    if score_cols:
-        df.drop(columns=score_cols, inplace=True)
-    df.to_csv(file_path, index=False, encoding="utf-8-sig")
-    print(f"update to: {file_path}")
+    df.to_csv(file_path, index=False, encoding='utf-8-sig')
+    print(f"File processed and saved: {file_path}")
+
+def find_today_csv_files():
+    today_files = [output_file1, output_file2]
+    
+    existing_files = []
+    for file in today_files:
+        if os.path.exists(file):
+            existing_files.append(file)
+        else:
+            print(f"donot find: {file}")
+    
+    return existing_files
 
 def main():
-    for file_path in [output_file1, output_file2]:
-        process_missing_scores_and_keywords(file_path)
+    
+    today_files = find_today_csv_files()
+    
+    if not today_files:
+        print("donot find today file")
+        return
+    
+    print(f"find {len(today_files)}:")
+    for file in today_files:
+        print(f"  - {file}")
+    
+    # 处理每个文件
+    for file_path in today_files:
+        print(f"\n complete: {file_path}")
+        try:
+            process_missing_scores_and_keywords(file_path)
+            print(f"file finish: {file_path}")
+        except Exception as e:
+            print(f": {file_path}, error: {e}")
+    
+    print(f"\ncomplete!")
 
 if __name__ == "__main__":
     main()
