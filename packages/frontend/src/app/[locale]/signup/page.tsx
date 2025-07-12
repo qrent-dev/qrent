@@ -95,7 +95,7 @@ const Signup = () => {
         </LabelInputContainer>
 
         <button
-          className="bg-gradient-to-br relative group/btn from-morandi-blue  to-neutral-800 block w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          className="bg-morandi-blue text-white rounded-md h-10 w-full font-medium shadow-inner hover:brightness-110 transition"
           type="submit"
         >
           {t('signup')} &rarr;
