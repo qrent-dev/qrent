@@ -3,10 +3,10 @@ const createNextIntlPlugin = require('next-intl/plugin');
 
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
   async headers() {
     return [
@@ -37,24 +37,6 @@ const nextConfig = {
               'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
         ],
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://134.175.168.147:5000/api/:path*',
-      },
-      {
-        source: '/:locale?/auth/login',
-        destination: 'http://139.180.164.78:3201/auth/login',
-        basePath: false,
-      },
-      {
-        source: '/:locale?/auth/register',
-        destination: 'http://139.180.164.78:3201/auth/register',
-        basePath: false,
       },
     ];
   },
