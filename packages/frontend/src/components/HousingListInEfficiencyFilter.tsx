@@ -73,7 +73,7 @@ const HousingListInEfficiencyFilter = () => {
 
       // Move-in date
       if (isValid(filter.avaliableDate)) {
-        requestBody.moveInDate = filter.avaliableDate;
+        requestBody.moveInDate = new Date(filter.avaliableDate);
       }
 
       // New Today

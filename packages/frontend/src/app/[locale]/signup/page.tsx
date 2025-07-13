@@ -31,7 +31,7 @@ const Signup = () => {
       }
       console.log(email, password);
 
-      const res = await fetch(`/auth/register`, {
+      const res = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
