@@ -1,12 +1,10 @@
 // @ts-nocheck
+import { NextRequest, NextResponse } from 'next/server';
 
-import { NextResponse } from 'next/server';
-
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-
-    const res = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/properties/search`, {
+    const body = await req.json();
+    const res = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,8 +19,8 @@ export async function POST(request: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (e) {
+    console.log(e);
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
