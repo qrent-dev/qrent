@@ -12,7 +12,8 @@ GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
 SCHOOL_COORDINATES = {
     'UNSW': "University of New South Wales, Kensington NSW 2052, Australia",
-    'USYD': "University of Sydney, Camperdown NSW 2006, Australia"
+    'USYD': "University of Sydney, Camperdown NSW 2006, Australia",
+    'UTS': "University of Technology Sydney, Ultimo NSW 2007, Australia"
 }
 
 class CommuteCalculator:
