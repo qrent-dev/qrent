@@ -167,9 +167,15 @@ def get_school_id(cursor, school_name):
     try:
         cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
         result = cursor.fetchone()
+        if result:
+            return result[0]
+        cursor.execute("INSERT INTO schools (name) VALUES (%s)", (school_name,))
+        cursor.connection.commit() if hasattr(cursor, 'connection') else None
+        cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
+        result = cursor.fetchone()
         return result[0] if result else None
     except Exception as e:
-        print(f"error to get school id  {e}")
+        print(f"error to get or create school id  {e}")
         return None
 
 def import_to_database(df, school_name):
@@ -306,7 +312,6 @@ def import_to_database(df, school_name):
                         if raw_general_value is not None and not pd.isna(raw_general_value):
                             commute_time = safe_int(raw_general_value)
                     
-                    # 修改逻辑：所有房源都插入 property_school 表，无论 commute_time 是否为 None
                     cursor.execute(
                         "INSERT INTO property_school (property_id, school_id, commute_time) VALUES (%s, %s, %s)",
                         (property_id, school_id, commute_time)
@@ -363,46 +368,48 @@ def import_to_database(df, school_name):
             print(f"disconneted")
 
 def process_csv_file(csv_file, clean_only=False):
-    
     if 'UNSW' in csv_file.upper():
         school_name = 'University of New South Wales'
     elif 'USYD' in csv_file.upper():
         school_name = 'University of Sydney'
+    elif 'UTS' in csv_file.upper():
+        school_name = 'University of Technology Sydney'
     else:
         print(f"cannot find : {csv_file}")
         return
-    
+
     print(f"school: {school_name}")
     print("=" * 60)
-    
+
     cleaned_file, df = clean_csv_file(csv_file)
-    
+
     import_to_database(df, school_name)
 
 def find_csv_files():
-    patterns = ['*UNSW*.csv', '*USYD*.csv']
+    patterns = ['*UNSW*.csv', '*USYD*.csv', '*UTS*.csv']
     found_files = []
-    
+
     for pattern in patterns:
         files = glob.glob(pattern)
         found_files.extend(files)
-    
+
     return found_files
 
 def find_today_csv_files():
     current_date = datetime.now().strftime('%y%m%d')
     today_files = [
         f'UNSW_rentdata_{current_date}.csv',
-        f'USYD_rentdata_{current_date}.csv'
+        f'USYD_rentdata_{current_date}.csv',
+        f'UTS_rentdata_{current_date}.csv'
     ]
-    
+
     existing_files = []
     for file in today_files:
         if os.path.exists(file):
             existing_files.append(file)
         else:
             print(f"cannot find : {file}")
-    
+
     return existing_files
 
 def main():

@@ -13,6 +13,7 @@ from commute_time import update_commute_time
 from point import main as process_missing_fields
 import subprocess
 import tempfile
+import shutil
 # Base URL template for rental listings
 base_url = "https://www.domain.com.au/rent/{}/?excludedeposittaken=1"
 
@@ -110,6 +111,8 @@ for filename in os.listdir(csv_directory):
 current_date = datetime.now().strftime("%y%m%d")
 output_file1 = f"UNSW_rentdata_{current_date}.csv"
 output_file2 = f"USYD_rentdata_{current_date}.csv"
+output_file3 = f"UTS_rentdata_{current_date}.csv"
+
 if __name__ == "__main__":
     clean_rental_data('UNSW')
     clean_rental_data('USYD')
@@ -120,44 +123,42 @@ if __name__ == "__main__":
     update_commute_time('USYD')
     process_missing_fields()
 
+    if os.path.exists(output_file2):
+        shutil.copyfile(output_file2, output_file3)
+        print(f"Copied {output_file2} to {output_file3} for UTS.")
+        update_commute_time('UTS')
+    else:
+        print(f"[ERROR] '{output_file2}' does not exist. Cannot create UTS data.")
+
     csv_file_1 = output_file1
     csv_file_2 = output_file2
+    csv_file_3 = output_file3
 
     # Use csv_cleaner_and_importer.py to process and import the CSV files
-    if os.path.exists(csv_file_1) and os.path.exists(csv_file_2):
-        print(f"Processing {csv_file_1} with csv_cleaner_and_importer.py...")
-        try:
-            result1 = subprocess.run([
-                'python', 'csv_cleaner_and_importer.py', 'process', csv_file_1
-            ], capture_output=True, text=True, check=True)
-            print(f"✅ Successfully processed {csv_file_1}")
-            print(result1.stdout)
-        except subprocess.CalledProcessError as e:
-            print(f"❌ Error processing {csv_file_1}: {e}")
-            print(f"Error output: {e.stderr}")
-        
-        print(f"Processing {csv_file_2} with csv_cleaner_and_importer.py...")
-        try:
-            result2 = subprocess.run([
-                'python', 'csv_cleaner_and_importer.py', 'process', csv_file_2
-            ], capture_output=True, text=True, check=True)
-            print(f"✅ Successfully processed {csv_file_2}")
-            print(result2.stdout)
-        except subprocess.CalledProcessError as e:
-            print(f"❌ Error processing {csv_file_2}: {e}")
-            print(f"Error output: {e.stderr}")
-    else:
-        if not os.path.exists(csv_file_1):
-            print(f"[ERROR] '{csv_file_1}' does not exist. Please check the file path.")
-        if not os.path.exists(csv_file_2):
-            print(f"[ERROR] '{csv_file_2}' does not exist. Please check the file path.")
+    for csv_file in [csv_file_1, csv_file_2, csv_file_3]:
+        if os.path.exists(csv_file):
+            print(f"Processing {csv_file} with csv_cleaner_and_importer.py...")
+            try:
+                result = subprocess.run([
+                    'python', 'csv_cleaner_and_importer.py', 'process', csv_file
+                ], capture_output=True, text=True, check=True)
+                print(f"✅ Successfully processed {csv_file}")
+                print(result.stdout)
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Error processing {csv_file}: {e}")
+                print(f"Error output: {e.stderr}")
+        else:
+            print(f"[ERROR] '{csv_file}' does not exist. Please check the file path.")
+
     # Remove the temporary files
     current_date = datetime.now().strftime("%y%m%d")
     files_to_remove = [
         f'USYD_rentdata_cleaned_{current_date}.csv', 
         'USYD_full_rentaldata_uncleaned.csv', 
         f'UNSW_rentdata_cleaned_{current_date}.csv', 
-        'UNSW_full_rentaldata_uncleaned.csv'
+        'UNSW_full_rentaldata_uncleaned.csv',
+        f'UTS_rentdata_cleaned_{current_date}.csv',
+        'UTS_full_rentaldata_uncleaned.csv'
     ]
 
     for file in files_to_remove:
@@ -172,7 +173,7 @@ if __name__ == "__main__":
             print(f"{filename} has been removed.")
     
     prev_date = datetime.fromtimestamp(datetime.now().timestamp() - 86400).strftime("%y%m%d")
-    files_to_remove_prev = [f'USYD_rentdata_{prev_date}.csv', f'UNSW_rentdata_{prev_date}.csv']
+    files_to_remove_prev = [f'USYD_rentdata_{prev_date}.csv', f'UNSW_rentdata_{prev_date}.csv', f'UTS_rentdata_{prev_date}.csv']
 
     for file in files_to_remove_prev:
         if os.path.exists(file):
