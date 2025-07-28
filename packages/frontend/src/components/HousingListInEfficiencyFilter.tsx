@@ -63,8 +63,13 @@ const HousingListInEfficiencyFilter = () => {
       }
 
       // School
-      requestBody.targetSchool =
-        filter.university === 'UNSW' ? 'University of New South Wales' : 'University of Sydney';
+      if (filter.university === 'UNSW') {
+        requestBody.targetSchool = 'University of New South Wales';
+      } else if (filter.university === 'USYD') {
+        requestBody.targetSchool = 'University of Sydney';
+      } else {
+        requestBody.targetSchool = 'University of Technology Sydney';
+      }
 
       // Area
       if (Array.isArray(filter.area) && filter.area.length && !filter.area.includes('Any')) {

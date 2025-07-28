@@ -46,6 +46,7 @@ export default function Search() {
               >
                 <option>UNSW</option>
                 <option>USYD</option>
+                <option>UTS</option>
               </select>
             </div>
 
