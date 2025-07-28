@@ -25,8 +25,13 @@ const JustLanded = () => {
     setLoading(true);
     try {
       const requestBody = {};
-      requestBody.targetSchool =
-        filter.university === 'UNSW' ? 'University of New South Wales' : 'University of Sydney';
+      if (filter.university === 'UNSW') {
+        requestBody.targetSchool = 'University of New South Wales';
+      } else if (filter.university === 'USYD') {
+        requestBody.targetSchool = 'University of Sydney';
+      } else {
+        requestBody.targetSchool = 'University of Technology Sydney';
+      }
       requestBody.page = 1;
       requestBody.pageSize = 9;
       requestBody.orderBy = [{ averageScore: 'desc' }];
@@ -78,12 +83,20 @@ const JustLanded = () => {
               UNSW
             </button>
             <button
-              className={`px-3 py-1 ${
+              className={`px-3 py-2 ${
                 school === 'usyd' ? 'bg-blue-primary text-white' : 'bg-gray-200'
               }`}
               onClick={() => setSchool('usyd')}
             >
               USYD
+            </button>
+            <button
+              className={`px-3 py-2 ${
+                school === 'uts' ? 'bg-blue-primary text-white' : 'bg-gray-200'
+              }`}
+              onClick={() => setSchool('uts')}
+            >
+              UTS
             </button>
           </div>
         </div>
