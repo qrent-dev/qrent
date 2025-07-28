@@ -119,6 +119,11 @@ class PropertyService {
 
     const filter: Prisma.PropertyWhereInput = {};
 
+    // Move-in date filter
+    if (preferences.moveInDate) {
+      filter.availableDate = { lte: new Date(preferences.moveInDate) };
+    }
+
     // Price filter
     filter.price = {};
     if (preferences.minPrice) {
