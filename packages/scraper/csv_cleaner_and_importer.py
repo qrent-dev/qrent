@@ -303,6 +303,8 @@ def import_to_database(df, school_name):
                         raw_commute_value = row.get('commuteTime_UNSW')
                     elif school_name == 'University of Sydney':
                         raw_commute_value = row.get('commuteTime_USYD')
+                    elif school_name == 'University of Technology Sydney':
+                        raw_commute_value = row.get('commuteTime_UTS')
                     
                     if raw_commute_value is not None and not pd.isna(raw_commute_value):
                         commute_time = safe_int(raw_commute_value)
