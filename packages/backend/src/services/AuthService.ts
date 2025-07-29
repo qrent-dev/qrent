@@ -54,7 +54,11 @@ class AuthService {
     return token;
   }
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+  async changeAuthProfile(
+    userId: number,
+    oldPassword: string,
+    newData: Pick<User, 'password' | 'phone' | 'email'>
+  ) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -67,13 +71,17 @@ class AuthService {
       throw new HttpError(400, 'Invalid old password');
     }
 
-    if (newPassword === oldPassword) {
+    if (newData.password === oldPassword) {
       throw new HttpError(400, 'New password cannot be the same as the old password');
     }
 
     await prisma.user.update({
       where: { id: userId },
-      data: { password: newPassword },
+      data: {
+        password: newData.password ?? user.password,
+        phone: newData.phone ?? user.phone,
+        email: newData.email ?? user.email,
+      },
     });
   }
 
@@ -87,7 +95,11 @@ class AuthService {
     }
 
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
-    await redis.setEx(`email_verification_code:${user.email}`, 60 * 10, verificationCode.toString());
+    await redis.setEx(
+      `email_verification_code:${user.email}`,
+      60 * 30,
+      verificationCode.toString()
+    );
 
     await emailService.sendVerificationEmail(user.email, verificationCode);
   }

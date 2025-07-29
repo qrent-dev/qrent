@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/register', catchError(authController.register));
 router.post('/login', catchError(authController.login));
-router.put('/change-password', catchError(authController.changePassword));
+router.put('/profile', catchError(authController.changeAuthProfile));
 router.post('/email/send-verification', catchError(authController.sendVerificationEmail));
 router.post('/email/verify', catchError(authController.verifyEmail));
 
