@@ -16,7 +16,6 @@ router.use('/rental-letter', rentalLetterRoutes);
 
 router.get('/echo', catchError(async (req: Request, res: Response) => {
   const echo = req.query.echo;
-    await propertyService.sendDailyPropertyRecommendation();
     res.json({ echo });
   })
 );

@@ -22,13 +22,13 @@ export class AuthController {
     const userId = req.user!.userId;
     const { oldPassword, password, phone, email } = req.body;
 
-    await authService.changeAuthProfile(userId, oldPassword, {
+    const profile = await authService.changeAuthProfile(userId, oldPassword, {
       password,
       phone,
       email,
     });
 
-    res.json({ message: 'Auth profile changed successfully' });
+    res.json(profile);
   }
 
   async sendVerificationEmail(req: Request, res: Response, next: NextFunction) {

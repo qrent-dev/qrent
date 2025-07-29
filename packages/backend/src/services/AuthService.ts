@@ -3,6 +3,8 @@ import HttpError from '@/error/HttpError';
 import { generateToken } from '@/utils/helper';
 import redis from '@/utils/redisClient';
 import { emailService } from '@/services/EmailService';
+import { hashPassword, comparePassword } from '@/utils/bcrypt';
+import { userService } from './UserService';
 
 class AuthService {
   async register(userData: User): Promise<string> {
@@ -11,7 +13,10 @@ class AuthService {
     }
 
     const user = await prisma.user.create({
-      data: userData,
+      data: {
+        ...userData,
+        password: await hashPassword(userData.password),
+      },
     });
 
     // Generate JWT token
@@ -36,7 +41,9 @@ class AuthService {
     if (!user) {
       throw new HttpError(400, 'Email not found');
     }
-    if (user.password !== userData.password) {
+    
+    const isPasswordValid = await comparePassword(userData.password, user.password);
+    if (!isPasswordValid) {
       throw new HttpError(400, 'Invalid password');
     }
 
@@ -67,22 +74,34 @@ class AuthService {
       throw new HttpError(400, 'User not found');
     }
 
-    if (user.password !== oldPassword) {
+    const isOldPasswordValid = await comparePassword(oldPassword, user.password);
+    if (!isOldPasswordValid) {
       throw new HttpError(400, 'Invalid old password');
     }
 
-    if (newData.password === oldPassword) {
+    if (newData.password && await comparePassword(newData.password, user.password)) {
       throw new HttpError(400, 'New password cannot be the same as the old password');
+    }
+
+    if (newData.email && await prisma.user.findUnique({ where: { email: newData.email } })) {
+      throw new HttpError(400, 'Email already exists');
+    }
+
+    if (newData.phone && await prisma.user.findUnique({ where: { phone: newData.phone } })) {
+      throw new HttpError(400, 'Phone number already exists');
     }
 
     await prisma.user.update({
       where: { id: userId },
       data: {
-        password: newData.password ?? user.password,
+        password: newData.password ? await hashPassword(newData.password) : user.password,
         phone: newData.phone ?? user.phone,
         email: newData.email ?? user.email,
+        emailVerified: newData.email === user.email ? user.emailVerified : false,
       },
     });
+
+    return userService.getProfile(userId);
   }
 
   async sendVerificationEmail(userId: number) {
