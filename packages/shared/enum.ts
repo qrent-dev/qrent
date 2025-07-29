@@ -12,3 +12,8 @@ export enum PROPERTY_TYPE {
 export enum EMAIL_PREFERENCE {
   DailyPropertyRecommendation = 1,
 }
+
+export enum GENDER {
+  Female = 0,
+  Male = 1,
+}

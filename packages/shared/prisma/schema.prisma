@@ -13,7 +13,7 @@ model User {
   email    String  @unique @db.VarChar(50)
   password String  @db.VarChar(200)
   name     String  @default("User") @db.VarChar(50)
-  gender   Int?    @db.UnsignedTinyInt
+  gender   Int?    @db.UnsignedTinyInt // enum
   phone    String? @unique @db.Char(11)
   emailVerified Boolean @default(false) @map("email_verified")
 

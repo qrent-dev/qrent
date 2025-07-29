@@ -20,7 +20,7 @@ export class PropertyController {
     res.json(result);
   }
 
-  async fetchSubscriptions(req: Request, res: Response, next: NextFunction) {
+  async getSubscriptions(req: Request, res: Response, next: NextFunction) {
     const userId = req.user!.userId;
     const result = await propertyService.fetchSubscriptions(userId);
 

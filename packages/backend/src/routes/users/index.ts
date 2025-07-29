@@ -5,8 +5,9 @@ import { userController } from '@/controllers/UserController';
 
 const router = Router();
 
-router.get('/subscriptions', catchError(propertyController.fetchSubscriptions));
-router.get('/preference', catchError(userController.fetchPreference));
+router.get('/subscriptions', catchError(propertyController.getSubscriptions));
+router.get('/preference', catchError(userController.getPreference));
 router.get('/profile', catchError(userController.getProfile));
+router.put('/profile', catchError(userController.updateProfile));
 
 export default router;
