@@ -5,6 +5,7 @@ import authRoutes from './auth';
 import userRoutes from './users';
 import propertyRoutes from './properties';
 import rentalLetterRoutes from './rentalLetter';
+import { propertyService } from '@/services/PropertyService';
 
 const router = Router();
 
@@ -13,10 +14,12 @@ router.use('/users', userRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/rental-letter', rentalLetterRoutes);
 
-router.get('/echo', (req: Request, res: Response) => {
+router.get('/echo', catchError(async (req: Request, res: Response) => {
   const echo = req.query.echo;
-  res.json({ echo });
-});
+    await propertyService.sendDailyPropertyRecommendation();
+    res.json({ echo });
+  })
+);
 
 router.delete(
   '/clear',

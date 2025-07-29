@@ -96,6 +96,9 @@ importers:
       mysql2:
         specifier: ^3.12.0
         version: 3.14.0
+      node-cron:
+        specifier: ^4.2.1
+        version: 4.2.1
       redis:
         specifier: ^5.6.1
         version: 5.6.1
@@ -5238,6 +5241,10 @@ packages:
 
   node-addon-api@5.1.0:
     resolution: {integrity: sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==}
+
+  node-cron@4.2.1:
+    resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
+    engines: {node: '>=6.0.0'}
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -12822,6 +12829,8 @@ snapshots:
       - babel-plugin-macros
 
   node-addon-api@5.1.0: {}
+
+  node-cron@4.2.1: {}
 
   node-fetch@2.7.0:
     dependencies:

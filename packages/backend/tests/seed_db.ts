@@ -1,7 +1,8 @@
 import { prisma as p } from '@qrent/shared';
+import { PROPERTY_TYPE, SCHOOL } from '@qrent/shared/enum';
 
-const FULL_SUBURB_OPTIONS = {
-  unsw: [
+const all_regions = {
+  [SCHOOL.UNSW]: [
     'alexandria',
     'arncliffe',
     'banksia',
@@ -53,7 +54,7 @@ const FULL_SUBURB_OPTIONS = {
     'st-peters',
     'wolli-creek',
   ],
-  usyd: [
+  [SCHOOL.USYD]: [
     'abbotsford',
     'alexandria',
     'allawah',
@@ -135,66 +136,104 @@ const FULL_SUBURB_OPTIONS = {
   ],
 };
 
-async function seed_school_region() {
-  // ... you will write your Prisma Client queries here
-  // p.properties.deleteMany({});
+async function seed_school() {
+  await p.propertySchool.deleteMany({});
   await p.school.deleteMany({});
-  // const allProperties = await p.properties.findMany({
-  //   select: { id: true }
-  // });
-
-  // const regions = await p.regions.findMany({
-  //   select: { id: true }
-  // });
-
-  await p.school.createMany({
-    data: [
-      {
-        name: 'UNSW',
-      },
-      {
-        name: 'USYD',
-      },
-    ],
-  });
-
-  FULL_SUBURB_OPTIONS.unsw.forEach(async suburb => {
-    await p.school.update({
-      where: {
-        name: 'UNSW',
-      },
+  for (const school of Object.values(SCHOOL)) {
+    await p.school.create({
       data: {
-        regions: {
-          connect: {
-            name: suburb,
-          },
-        },
+        name: school,
       },
     });
-  });
-
-  FULL_SUBURB_OPTIONS.usyd.forEach(async suburb => {
-    await p.school.update({
-      where: {
-        name: 'USYD',
-      },
-      data: {
-        regions: {
-          connect: {
-            name: suburb,
-          },
-        },
-      },
-    });
-  });
+  }
 }
 
-async function seed_property_school() {
-  await p.propertySchool.deleteMany({});
-  const properties = await p.property.findMany({
-    include: {
-      region: true,
+async function seed_region() {
+  await p.property.deleteMany({});
+  await p.region.deleteMany({});
+
+  for (const region of all_regions[SCHOOL.UNSW]) {
+    await p.region.upsert({
+      where: {
+        name: region,
+      },
+      create: {
+        name: region,
+        state: 'NSW',
+        postcode: 2000,
+      },
+      update: {
+        name: region,
+        state: 'NSW',
+        postcode: 2000,
+      },
+    });
+  }
+
+  for (const region of all_regions[SCHOOL.USYD]) {
+    await p.region.upsert({
+      where: {
+        name: region,
+      },
+      create: {
+        name: region,
+        state: 'NSW',
+        postcode: 2000,
+      },
+      update: {
+        name: region,
+        state: 'NSW',
+        postcode: 2000,
+      },
+    });
+  }
+}
+
+async function seed_property(num: number) {
+  await p.property.deleteMany({});
+
+  const upper = await p.region.findFirst({
+    orderBy: {
+      id: 'asc',
     },
+  });
+
+  const lower = await p.region.findFirst({
+    orderBy: {
+      id: 'desc',
+    },
+  });
+
+  const upper_bound = upper?.id!;
+  const lower_bound = lower?.id!;
+
+  for (let i = 0; i < num; i++) {
+    await p.property.create({
+      data: {
+        address: `123 Main St ${i}`,
+        price: Math.floor(500 + (Math.random() * 3000)),
+        propertyType: PROPERTY_TYPE.Apartment,
+        houseId: i,
+        publishedAt: new Date(),
+        regionId: Math.floor(
+          Math.random() * (upper_bound - lower_bound) + lower_bound,
+        ),
+        bathroomCount: Math.floor(Math.random() * 3),
+        bedroomCount: Math.floor(Math.random() * 3),
+        parkingCount: Math.floor(Math.random() * 3),
+        keywords: 'This is a test description',
+        averageScore: Math.floor(13 + Math.random() * 18),
+      },
+    });
+  }
+}
+
+  async function seed_property_school() {
+    await p.propertySchool.deleteMany({});
+    const properties = await p.property.findMany({
+      include: {
+        region: true,
+      },
   });
 
   const schools = await p.school.findMany();
@@ -206,8 +245,8 @@ async function seed_property_school() {
 
       // Check if the region is related to the school
       const isRelated =
-        (schoolName === 'unsw' && FULL_SUBURB_OPTIONS.unsw.includes(regionName)) ||
-        (schoolName === 'usyd' && FULL_SUBURB_OPTIONS.usyd.includes(regionName));
+        (schoolName === 'unsw' && all_regions.UNSW.includes(regionName)) ||
+        (schoolName === 'usyd' && all_regions.USYD.includes(regionName));
 
       if (isRelated) {
         await p.propertySchool.create({
@@ -223,6 +262,9 @@ async function seed_property_school() {
 }
 
 async function main() {
+  await seed_school();
+  await seed_region();
+  await seed_property(100);
   await seed_property_school();
 }
 

@@ -101,7 +101,7 @@ class AuthService {
       verificationCode.toString()
     );
 
-    await emailService.sendVerificationEmail(user.email, verificationCode);
+    await emailService.sendVerificationCode(user.email, verificationCode);
   }
 
   async verifyEmail(email: string, code: number) {

@@ -1,7 +1,9 @@
-import { Prisma, prisma, User, Preference, Property } from '@qrent/shared';
+import { Prisma, prisma, User, Preference, Property, Region } from '@qrent/shared';
+import { EMAIL_PREFERENCE, PROPERTY_TYPE, SCHOOL } from '@qrent/shared/enum';
 import HttpError from '@/error/HttpError';
 import validationService from './ValidationService';
 import _ from 'lodash';
+import { emailService } from './EmailService';
 
 class PropertyService {
   async fetchSubscriptions(userId: number): Promise<any[]> {
@@ -59,6 +61,12 @@ class PropertyService {
     return `Successfully unsubscribed from property`;
   }
 
+  async createPreference(preferences: Preference): Promise<Preference> {
+    return await prisma.preference.create({
+      data: preferences,
+    });
+  }
+
   /**
    * Get properties based on user preferences with pagination
    * @param preferences - User preferences with pagination parameters
@@ -70,17 +78,15 @@ class PropertyService {
       pageSize: number;
       publishedAt?: string;
       orderBy?: Prisma.PropertyOrderByWithRelationInput[];
-    },
-    userId: number | undefined
-  ): Promise<any> {
-    // Create preference
-    await prisma.preference.create({
-      data: {
-        ..._.omit(preferences, ['page', 'pageSize', 'orderBy', 'publishedAt']),
-        userId,
-      },
-    });
-
+    }
+  ): Promise<{
+    properties: any[];
+    totalCount: number;
+    filteredCount: number;
+    averagePrice: number | null;
+    averageCommuteTime: number | null;
+    topRegions: any[];
+  }> {
     const page = preferences.page;
     const pageSize = preferences.pageSize;
     const skip = (page - 1) * pageSize;
@@ -328,6 +334,67 @@ class PropertyService {
     }
 
     return preference;
+  }
+
+  async sendDailyPropertyRecommendation() {
+    const recipients = await prisma.user.findMany({
+      where: {
+        emailPreferences: {
+          some: {
+            type: EMAIL_PREFERENCE.DailyPropertyRecommendation,
+          },
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    for (const recipient of recipients) {
+      let recommendations: (Property & { region: Region })[] = [];
+
+      const preference = await prisma.preference.findFirst({
+        where: {
+          userId: recipient.id,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
+
+      if (!preference) {
+        recommendations = await prisma.property.findMany({
+          include: {
+            region: true,
+          },
+          orderBy: {
+            averageScore: 'desc',
+          },
+          take: 10,
+        });
+        continue;
+      } else {
+        const preferenceArg: Preference & {
+          page: number;
+          pageSize: number;
+          orderBy: Prisma.PropertyOrderByWithRelationInput[];
+        } = {
+          ...preference,
+          page: 1,
+          pageSize: 10,
+          orderBy: [
+            {
+              averageScore: 'desc',
+            },
+          ],
+        };
+        const { properties } = await this.getPropertiesByPreferences(preferenceArg);
+        recommendations = properties;
+      }
+
+      await emailService.sendDailyPropertyRecommendation(recipient.email, recommendations);
+    }
   }
 }
 
