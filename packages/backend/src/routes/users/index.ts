@@ -7,5 +7,6 @@ const router = Router();
 
 router.get('/subscriptions', catchError(propertyController.fetchSubscriptions));
 router.get('/preference', catchError(userController.fetchPreference));
+router.get('/profile', catchError(userController.getProfile));
 
 export default router;

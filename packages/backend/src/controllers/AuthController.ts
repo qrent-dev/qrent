@@ -26,6 +26,19 @@ export class AuthController {
 
     res.json({ message: 'Password changed successfully' });
   }
+
+  async sendVerificationEmail(req: Request, res: Response, next: NextFunction) {
+    console.log('hello');
+    const userId = req.user!.userId;
+    await authService.sendVerificationEmail(userId);
+    res.json({ message: 'Verification email sent' });
+  }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    const { email, code } = req.body;
+    await authService.verifyEmail(email, code);
+    res.json({ message: 'Email verified' });
+  }
 }
 
 export const authController = new AuthController();

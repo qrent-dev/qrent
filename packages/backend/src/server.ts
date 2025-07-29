@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { authenticate } from './utils/helper';
 import path from 'path';
-import fs from 'fs';
 
 const app = express();
 

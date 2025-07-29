@@ -15,6 +15,7 @@ model User {
   name     String  @default("User") @db.VarChar(50)
   gender   Int?    @db.UnsignedTinyInt
   phone    String? @unique @db.Char(11)
+  emailVerified Boolean @default(false) @map("email_verified")
 
   userSessions UserSession[]
   preferences  Preference[]
