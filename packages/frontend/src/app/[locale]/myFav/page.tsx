@@ -24,7 +24,19 @@ const Page = () => {
       }
 
       try {
-        const subscriptions = await getUserSubscriptions(token);
+        const res = await fetch('/api/users/subscriptions', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+
+        const subscriptions = await res.json();
+
         updateFilter({ subscriptions });
       } catch (err) {
         console.error('Failed to fetch subscriptions', err);

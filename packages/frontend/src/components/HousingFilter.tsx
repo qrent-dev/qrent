@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { useFilterStore } from '../store/useFilterStore';
 import { ChevronDown } from 'lucide-react';
 import { useUserStore } from '../store/userInfoStore';
-import { getUserSubscriptions } from '../app/api/properties/client/getUserSubscriptions';
 import AreaCheckbox from './AreaCheckbox';
 
 const HousingFilter = () => {

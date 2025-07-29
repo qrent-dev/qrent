@@ -41,7 +41,7 @@ export default function DropDownList() {
             <DropdownItem key="prepareDocuments" href="/prepareDocuments" className="font-sans">
               {t('prepare-documents')}
             </DropdownItem>
-            <DropdownItem key="prepareDocuments" href="/myFav" className="font-sans">
+            <DropdownItem key="my-fav" href="/myFav" className="font-sans">
               {t('myFav')}
             </DropdownItem>
             <DropdownItem
