@@ -21,7 +21,6 @@ class UserController {
     const profile = await userService.updateProfile(userId, { name, gender, emailPreferences });
     res.json(profile);
   }
-
 }
 
 export const userController = new UserController();

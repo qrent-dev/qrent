@@ -41,7 +41,7 @@ class AuthService {
     if (!user) {
       throw new HttpError(400, 'Email not found');
     }
-    
+
     const isPasswordValid = await comparePassword(userData.password, user.password);
     if (!isPasswordValid) {
       throw new HttpError(400, 'Invalid password');
@@ -79,15 +79,15 @@ class AuthService {
       throw new HttpError(400, 'Invalid old password');
     }
 
-    if (newData.password && await comparePassword(newData.password, user.password)) {
+    if (newData.password && (await comparePassword(newData.password, user.password))) {
       throw new HttpError(400, 'New password cannot be the same as the old password');
     }
 
-    if (newData.email && await prisma.user.findUnique({ where: { email: newData.email } })) {
+    if (newData.email && (await prisma.user.findUnique({ where: { email: newData.email } }))) {
       throw new HttpError(400, 'Email already exists');
     }
 
-    if (newData.phone && await prisma.user.findUnique({ where: { phone: newData.phone } })) {
+    if (newData.phone && (await prisma.user.findUnique({ where: { phone: newData.phone } }))) {
       throw new HttpError(400, 'Phone number already exists');
     }
 

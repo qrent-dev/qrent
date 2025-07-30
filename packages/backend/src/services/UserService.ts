@@ -24,7 +24,7 @@ class UserService {
 
     // Update email preferences
     await this.updateEmailPreferences(userId, profileData.emailPreferences);
-    
+
     // Return updated profile
     return this.getProfile(userId);
   }
@@ -36,10 +36,10 @@ class UserService {
         throw new Error('Invalid email preference type');
       }
     }
-    
+
     // Get current email preferences
-    const existingPreferences = await prisma.emailPreference.findMany({ 
-      where: { userId } 
+    const existingPreferences = await prisma.emailPreference.findMany({
+      where: { userId },
     });
     const existingPreferenceTypes = existingPreferences.map(pref => pref.type);
     const newPreferenceTypes = newPreferences.map(pref => pref.type);
@@ -47,11 +47,11 @@ class UserService {
     // Remove preferences that are no longer selected
     for (const preference of existingPreferences) {
       if (!newPreferenceTypes.includes(preference.type)) {
-        await prisma.emailPreference.delete({ 
-          where: { 
-            userId: preference.userId, 
-            type: preference.type 
-          } 
+        await prisma.emailPreference.delete({
+          where: {
+            userId: preference.userId,
+            type: preference.type,
+          },
         });
       }
     }

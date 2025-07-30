@@ -14,8 +14,10 @@ router.use('/users', userRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/rental-letter', rentalLetterRoutes);
 
-router.get('/echo', catchError(async (req: Request, res: Response) => {
-  const echo = req.query.echo;
+router.get(
+  '/echo',
+  catchError(async (req: Request, res: Response) => {
+    const echo = req.query.echo;
     res.json({ echo });
   })
 );

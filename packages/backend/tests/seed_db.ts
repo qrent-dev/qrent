@@ -211,13 +211,11 @@ async function seed_property(num: number) {
     await p.property.create({
       data: {
         address: `123 Main St ${i}`,
-        price: Math.floor(500 + (Math.random() * 3000)),
+        price: Math.floor(500 + Math.random() * 3000),
         propertyType: PROPERTY_TYPE.Apartment,
         houseId: i,
         publishedAt: new Date(),
-        regionId: Math.floor(
-          Math.random() * (upper_bound - lower_bound) + lower_bound,
-        ),
+        regionId: Math.floor(Math.random() * (upper_bound - lower_bound) + lower_bound),
         bathroomCount: Math.floor(Math.random() * 3),
         bedroomCount: Math.floor(Math.random() * 3),
         parkingCount: Math.floor(Math.random() * 3),
@@ -228,12 +226,12 @@ async function seed_property(num: number) {
   }
 }
 
-  async function seed_property_school() {
-    await p.propertySchool.deleteMany({});
-    const properties = await p.property.findMany({
-      include: {
-        region: true,
-      },
+async function seed_property_school() {
+  await p.propertySchool.deleteMany({});
+  const properties = await p.property.findMany({
+    include: {
+      region: true,
+    },
   });
 
   const schools = await p.school.findMany();
