@@ -8,13 +8,17 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { authenticate } from './utils/helper';
 import path from 'path';
-import fs from 'fs';
 
 const app = express();
 
 /////////////////////////////////////////////////////////////////////
 // Server Setup
 /////////////////////////////////////////////////////////////////////
+
+// Load environment variables
+if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+}
 
 // Middleware to parse JSON bodies
 app.use(express.json());
