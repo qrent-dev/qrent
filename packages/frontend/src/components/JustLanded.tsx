@@ -25,9 +25,9 @@ const JustLanded = () => {
     setLoading(true);
     try {
       const requestBody = {};
-      if (filter.university === 'UNSW') {
+      if (school === 'unsw') {
         requestBody.targetSchool = 'University of New South Wales';
-      } else if (filter.university === 'USYD') {
+      } else if (school === 'usyd') {
         requestBody.targetSchool = 'University of Sydney';
       } else {
         requestBody.targetSchool = 'University of Technology Sydney';
@@ -78,7 +78,10 @@ const JustLanded = () => {
               className={`px-3 py-2 ${
                 school === 'unsw' ? 'bg-blue-primary text-white' : 'bg-gray-200'
               }`}
-              onClick={() => setSchool('unsw')}
+              onClick={() => {
+                setSchool('unsw');
+                updateFilter({ university: 'UNSW' });
+              }}
             >
               UNSW
             </button>
@@ -86,7 +89,10 @@ const JustLanded = () => {
               className={`px-3 py-2 ${
                 school === 'usyd' ? 'bg-blue-primary text-white' : 'bg-gray-200'
               }`}
-              onClick={() => setSchool('usyd')}
+              onClick={() => {
+                setSchool('usyd');
+                updateFilter({ university: 'USYD' });
+              }}
             >
               USYD
             </button>
@@ -94,7 +100,10 @@ const JustLanded = () => {
               className={`px-3 py-2 ${
                 school === 'uts' ? 'bg-blue-primary text-white' : 'bg-gray-200'
               }`}
-              onClick={() => setSchool('uts')}
+              onClick={() => {
+                setSchool('uts');
+                updateFilter({ university: 'UTS' });
+              }}
             >
               UTS
             </button>
