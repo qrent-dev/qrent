@@ -67,6 +67,9 @@ jobs:
             DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
             DATABASE_URL=mysql://root:${{ secrets.DB_ROOT_PASSWORD }}@db:3306/${{ secrets.DB_DATABASE_NAME }}
             NSW_TRANSPORT_API_KEY=${{ secrets.NSW_TRANSPORT_API_KEY }}
+            SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
             EOL
 
             docker compose down

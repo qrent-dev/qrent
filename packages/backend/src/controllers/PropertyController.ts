@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { propertyService } from '@/services/PropertyService';
 import { Preference } from '@qrent/shared';
+import _ from 'lodash';
 
 export class PropertyController {
   async handleSubscribeProperty(req: Request, res: Response, next: NextFunction) {
@@ -19,7 +20,7 @@ export class PropertyController {
     res.json(result);
   }
 
-  async fetchSubscriptions(req: Request, res: Response, next: NextFunction) {
+  async getSubscriptions(req: Request, res: Response, next: NextFunction) {
     const userId = req.user!.userId;
     const result = await propertyService.fetchSubscriptions(userId);
 
@@ -27,11 +28,16 @@ export class PropertyController {
   }
 
   async fetchProperty(req: Request, res: Response) {
-    const preferences: Preference & { page: number; pageSize: number } = req.body;
-    const properties = await propertyService.getPropertiesByPreferences(
-      preferences,
-      req.user?.userId
+    let preferences: Preference & { page: number; pageSize: number } = req.body;
+
+    if (req.user?.userId) {
+      preferences.userId = req.user.userId;
+    }
+    await propertyService.createPreference(
+      _.omit(preferences, ['page', 'pageSize', 'orderBy', 'publishedAt']) as Preference
     );
+
+    const properties = await propertyService.getPropertiesByPreferences(preferences);
     res.json(properties);
   }
 }

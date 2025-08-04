@@ -18,13 +18,29 @@ export class AuthController {
     res.json({ token });
   }
 
-  async changePassword(req: Request, res: Response, next: NextFunction) {
+  async changeAuthProfile(req: Request, res: Response, next: NextFunction) {
     const userId = req.user!.userId;
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, password, phone, email } = req.body;
 
-    await authService.changePassword(userId, oldPassword, newPassword);
+    const profile = await authService.changeAuthProfile(userId, oldPassword, {
+      password,
+      phone,
+      email,
+    });
 
-    res.json({ message: 'Password changed successfully' });
+    res.json(profile);
+  }
+
+  async sendVerificationEmail(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user!.userId;
+    await authService.sendVerificationEmail(userId);
+    res.json({ message: 'Verification email sent' });
+  }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    const { email, code } = req.body;
+    await authService.verifyEmail(email, code);
+    res.json({ message: 'Email verified' });
   }
 }
 

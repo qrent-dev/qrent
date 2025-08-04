@@ -34,12 +34,33 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - qrent-network
+
+  redis:
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - qrent-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
 
 networks:
   qrent-network:
 
 volumes:
   db_data:
+  redis_data:

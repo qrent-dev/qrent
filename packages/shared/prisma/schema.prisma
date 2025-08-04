@@ -13,14 +13,26 @@ model User {
   email    String  @unique @db.VarChar(50)
   password String  @db.VarChar(200)
   name     String  @default("User") @db.VarChar(50)
-  gender   Int?    @db.UnsignedTinyInt
+  gender   Int?    @db.UnsignedTinyInt // enum
   phone    String? @unique @db.Char(11)
+  emailVerified Boolean @default(false) @map("email_verified")
 
+  emailPreferences EmailPreference[]
   userSessions UserSession[]
   preferences  Preference[]
   properties   Property[]
 
   @@map("users")
+}
+
+model EmailPreference {
+  userId Int @map("user_id") @db.UnsignedInt
+  user User @relation(fields: [userId], references: [id])
+
+  type Int @db.UnsignedTinyInt
+  
+  @@id([userId, type])  // Composite key
+  @@map("email_preferences")
 }
 
 model UserSession {
