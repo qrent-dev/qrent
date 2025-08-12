@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { HiMenu, HiX } from 'react-icons/hi'
+import Link from 'next/link'
 
 export default function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -24,7 +25,7 @@ export default function Header() {
           <div className="mt-2 rounded-xl lg:rounded-2xl overflow-hidden border border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
             <div className="h-16 px-2 sm:px-3 lg:px-4 flex items-center justify-between">
             {/* Left: logo + brand */}
-            <a href="#" className="flex items-center" aria-label="Qrent home">
+            <Link href="/" className="flex items-center" aria-label="Qrent home">
               <Image
                 src="/qrent-logo.jpg"
                 alt="Qrent"
@@ -33,7 +34,7 @@ export default function Header() {
                 priority
                 className="rounded-md"
               />
-            </a>
+            </Link>
 
             {/* Center: desktop nav */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
@@ -72,13 +73,15 @@ export default function Header() {
           <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl">
             <div className="h-16 flex items-center justify-between px-4 border-b">
               <div className="flex items-center">
-                <Image
-                  src="/qrent-logo.jpg"
-                  alt="Qrent"
-                  width={36}
-                  height={36}
-                  className="rounded-md"
-                />
+                <Link href="/" onClick={closeDrawer}>
+                  <Image
+                    src="/qrent-logo.jpg"
+                    alt="Qrent"
+                    width={36}
+                    height={36}
+                    className="rounded-md"
+                  />
+                </Link>
               </div>
               <button 
                 onClick={closeDrawer}
